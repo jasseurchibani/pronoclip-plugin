@@ -4,8 +4,9 @@ Plugin Claude Code pour la génération de **vidéos de pronostics football (sco
 rendu vidéo en local avec **HyperFrames**, planification des routines par **journée de matchs**
 via **RapidoRH**, publication via **RapidoCMS**, et transformation des logs d'exécution en **dailies**.
 
-> Version 0.1.0 — squelette. Les commandes, skills et agents seront ajoutés dans les
-> prochaines itérations ; ce README fixe les prérequis et l'architecture cible.
+> Version 0.2.0 — plugin fonctionnellement complet (3 commandes, 6 skills,
+> 1 subagent, 5 références). Passage en 1.0.0 après validation de la
+> section « Recette ».
 
 ---
 
@@ -58,7 +59,6 @@ Par défaut, toutes les routines par journée de matchs utilisent le rendu local
 | `/pronoclip-routine` | Sense → Report | `routine-matchs` | Traite une journée complète : détection des matchs, tâches RapidoRH, validation GO, compositions en parallèle (`video-composer`), publication CMS, log. Ex. : `/pronoclip-routine demain`. |
 | `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). |
 
-*(Les fichiers `commands/` restent à créer ; les skills et l'agent sont en place.)*
 
 ## Configuration
 
@@ -126,7 +126,10 @@ Tests de recette à dérouler avant toute mise en production chez un client :
 pronoclip-video/
 ├── .claude-plugin/
 │   └── plugin.json                    # Manifeste du plugin
-├── commands/                          # Slash commands (à venir)
+├── commands/
+│   ├── pronoclip-match.md             # /pronoclip-match → skill video-pronostic
+│   ├── pronoclip-routine.md           # /pronoclip-routine → skill routine-matchs
+│   └── pronoclip-daily.md             # /pronoclip-daily → skill suivi-rh-daily (B)
 ├── skills/
 │   ├── video-pronostic/SKILL.md       # Une vidéo : brief → composition → rendu local
 │   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
