@@ -11,33 +11,23 @@ Publie une vidéo de pronostic sur les réseaux sociaux avec le MCP
 **RapidoCMS** : upload du média, brouillon au ton PronoClip, planification
 avant le coup d'envoi, rattachement à la campagne de la compétition.
 
-## CONFIG (paramétrable — adapter ici pour chaque client)
+## CONFIG (centralisée — plugin revendable)
 
-> Cette section centralise tout ce qui change d'un client à l'autre, pour
-> que le plugin reste revendable sans toucher au workflow.
+Tout ce qui change d'un client à l'autre vient de
+**`./pronoclip-data/config.json`** — schéma canonique et onboarding définis
+dans le skill `routine-matchs` (Phase 0). **Aucune valeur en dur** dans ce
+skill. Clés utilisées ici :
 
-| Paramètre | Valeur par défaut | Note |
+| Clé | Défaut à l'installation | Usage |
 |---|---|---|
-| `company_id` CMS | `321` | identifiant société RapidoCMS |
-| Comptes cibles | *(découverte auto)* | à lister via `list_connected_accounts` au **premier usage**, puis mémoriser dans `./pronoclip-data/config.json` |
-| Fenêtre de publication | H-6 → H-2 avant le coup d'envoi | règle métier PronoClip |
-| Hashtags de base | `#PronoClip` | + hashtags des équipes du match |
+| `cms.company_id` | `321` | identifiant société RapidoCMS |
+| `cms.comptes` | *(découverte onboarding)* | comptes cibles de publication |
+| `fenetre_publication` | H-6 → H-2 | créneau avant coup d'envoi (étape 3) |
+| `langue_captions` | `fr` | langue des captions (étape 2) |
 
-Format de `./pronoclip-data/config.json` (créé au premier usage) :
-
-```json
-{
-  "company_id": 321,
-  "comptes": [
-    { "id": "…", "plateforme": "tiktok", "nom": "…" },
-    { "id": "…", "plateforme": "instagram", "nom": "…" }
-  ]
-}
-```
-
-Si `config.json` existe, l'utiliser directement ; sinon appeler
-`list_connected_accounts`, présenter les comptes trouvés à l'utilisateur,
-et enregistrer son choix dans le fichier.
+Si `config.json` n'existe pas encore (skill invoqué hors routine) : appeler
+`list_connected_accounts`, faire valider les comptes par l'utilisateur, et
+écrire la section `cms` du fichier (fusionner sans écraser les autres clés).
 
 ## Étape 1 — UPLOAD
 

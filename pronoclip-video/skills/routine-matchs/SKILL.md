@@ -18,6 +18,50 @@ Cette routine ne génère rien elle-même : elle dispatche le subagent
 Pour une vidéo unique hors routine, c'est le skill `video-pronostic` qui
 s'applique. Lire la section **Garde-fous** avant toute exécution.
 
+## Phase 0 — CONFIG : onboarding au premier lancement
+
+Toute la configuration du plugin vit dans **`./pronoclip-data/config.json`**
+(CONFIG swappable : aucun skill ne code ces valeurs en dur, le plugin reste
+revendable en changeant ce seul fichier).
+
+- **Si le fichier existe** : le charger et passer directement en Phase 1.
+- **Sinon**, dérouler le mini-flow d'onboarding, puis écrire le fichier :
+
+1. **CMS** — `company_id` (défaut : `321`) ; comptes sociaux cibles via
+   `list_connected_accounts`, choix validé par l'utilisateur ;
+2. **RH** — projet et colonnes créés/résolus via le skill `suivi-rh-daily`
+   (Partie A) → IDs numériques ;
+3. **Compétitions suivies** (défaut : Ligue des Champions, Ligue Europa,
+   Euro) ;
+4. **Style par défaut** (défaut : `néon`), **fenêtre de publication**
+   (défaut : H-6 → H-2) et **langue des captions** (défaut : `fr`).
+
+Schéma canonique du fichier (source de vérité pour TOUS les skills) :
+
+```json
+{
+  "cms": {
+    "company_id": 321,
+    "comptes": [
+      { "id": "…", "plateforme": "tiktok", "nom": "…" }
+    ]
+  },
+  "rh": {
+    "projet_id": 29,
+    "colonnes": {
+      "matchs_a_traiter": 101,
+      "video_en_cours": 102,
+      "publie": 103,
+      "echecs_a_reprendre": 104
+    }
+  },
+  "competitions": ["Ligue des Champions", "Ligue Europa", "Euro"],
+  "style_defaut": "néon",
+  "fenetre_publication": { "max_avant_kickoff_h": 6, "min_avant_kickoff_h": 2 },
+  "langue_captions": "fr"
+}
+```
+
 ## Phase 1 — SENSE : récupérer les matchs
 
 1. Déterminer la période demandée : une **date** (« les matchs du 12/07 »)
@@ -26,8 +70,9 @@ s'applique. Lire la section **Garde-fous** avant toute exécution.
    - **Fichier local** `./pronoclip-data/matchs-{date}.json` s'il existe
      (source de vérité prioritaire) ;
    - sinon, **recherche web** sur les calendriers officiels des compétitions.
-3. Compétitions par défaut (si l'utilisateur ne précise pas) :
-   **Ligue des Champions, Ligue Europa, Euro**.
+3. Compétitions par défaut (si l'utilisateur ne précise pas) : celles de
+   `competitions` dans `config.json` (Ligue des Champions, Ligue Europa,
+   Euro à l'installation).
 
 Format du fichier `matchs-{date}.json` :
 

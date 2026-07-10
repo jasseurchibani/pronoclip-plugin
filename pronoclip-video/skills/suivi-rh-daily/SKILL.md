@@ -50,8 +50,9 @@ Deux responsabilités, via le MCP **RapidoRh** :
    }
    ```
 
-   (Fichier partagé avec le skill `publication-cms` : fusionner les clés,
-   ne pas écraser la section `comptes`/`company_id`.)
+   (Fichier de CONFIG central du plugin — schéma canonique complet et
+   onboarding dans le skill `routine-matchs`, Phase 0. Fusionner la section
+   `rh` sans écraser les autres clés : `cms`, `competitions`, etc.)
 
 ### Opérations exposées aux autres skills
 

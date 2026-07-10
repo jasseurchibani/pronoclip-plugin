@@ -52,13 +52,23 @@ Par défaut, toutes les routines par journée de matchs utilisent le rendu local
 
 ## Commandes
 
-| Commande | Phase(s) | Description |
-|---|---|---|
-| `/pronoclip-video:planifier-journee` | Sense → Plan | Détecte la prochaine journée de matchs, sélectionne les affiches, crée le projet / les tâches RapidoRH et programme la routine de production. |
-| `/pronoclip-video:generer-video` | Act | Génère la vidéo de pronostic (score exact) pour un match ou une journée : composition HTML/GSAP puis rendu **local** via le CLI HyperFrames. |
-| `/pronoclip-video:publier-dailies` | Feed → Report | Publie ou planifie les vidéos via RapidoCMS, puis transforme les logs d'exécution en **dailies** RapidoRH. |
+| Commande | Phase(s) | Skill sous-jacent | Description |
+|---|---|---|---|
+| `/pronoclip-match` | Act | `video-pronostic` | Génère UNE vidéo de pronostic (score exact) : composition HTML/GSAP puis rendu **local** via le CLI HyperFrames. Ex. : `/pronoclip-match PSG Real 2-1 néon`. |
+| `/pronoclip-routine` | Sense → Report | `routine-matchs` | Traite une journée complète : détection des matchs, tâches RapidoRH, validation GO, compositions en parallèle (`video-composer`), publication CMS, log. Ex. : `/pronoclip-routine demain`. |
+| `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). |
 
-*(Squelette : le contenu des commandes/skills n'est pas encore implémenté.)*
+*(Les fichiers `commands/` restent à créer ; les skills et l'agent sont en place.)*
+
+## Configuration
+
+Toute la configuration client vit dans **`./pronoclip-data/config.json`**
+(CONFIG swappable) : `company_id` CMS, comptes sociaux, IDs projet/colonnes
+RapidoRH, compétitions suivies, style par défaut, fenêtre de publication
+(H-6 → H-2), langue des captions. Le fichier est créé au premier lancement
+par le mini-flow d'onboarding de `/pronoclip-routine` (skill
+`routine-matchs`, Phase 0) — aucun skill ne code ces valeurs en dur, le
+plugin se revend en changeant ce seul fichier.
 
 ---
 
@@ -94,16 +104,35 @@ Cycle appliqué à chaque **journée de matchs** :
 
 ---
 
+## Recette
+
+Tests de recette à dérouler avant toute mise en production chez un client :
+
+| # | Test | Critères de succès |
+|---|---|---|
+| 1 | `/pronoclip-match PSG Real 2-1 néon` | MP4 rendu **localement** dans `./pronoclip-output/` ; `hyperframes lint` OK ; mention « généré par IA » visible ; **aucun logo** de club ni de compétition. |
+| 2 | `/pronoclip-routine demain` | Le plan (N matchs → N tâches → GO ?) est présenté **avant** toute génération ; les tâches sont créées dans les **bonnes colonnes** Kanban ; les posts sont planifiés avec `post_heure` au format **HH:MM:SS**, dans la fenêtre H-6 → H-2. |
+| 3 | `/pronoclip-daily` | Un daily **unique** est créé (pas de doublon si relancé) ; les heures sont cohérentes avec les durées des logs (somme arrondie au 0,5 h). |
+| 4 | Cas d'échec : match sans couleurs connues | Les couleurs **par défaut** du template sont appliquées ; l'échec éventuel est loggé en **KO** ; la routine **continue** sur les matchs suivants sans blocage. |
+
 ## Structure du plugin
 
 ```
 pronoclip-video/
 ├── .claude-plugin/
-│   └── plugin.json      # Manifeste du plugin
-├── commands/            # Slash commands (à venir)
-├── skills/              # Skills (à venir)
-├── agents/              # Agents spécialisés (à venir)
-├── reference/           # Documentation de référence (à venir)
+│   └── plugin.json                    # Manifeste du plugin
+├── commands/                          # Slash commands (à venir)
+├── skills/
+│   ├── video-pronostic/SKILL.md       # Une vidéo : brief → composition → rendu local
+│   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
+│   ├── publication-cms/SKILL.md       # Upload, brouillon, planification, campagne
+│   └── suivi-rh-daily/SKILL.md        # Kanban RapidoRH + dailies
+├── agents/
+│   └── video-composer.md              # Subagent de composition (parallélisable, max 3)
+├── reference/
+│   ├── charte-pronoclip.md            # Identité visuelle/éditoriale, captions, thèmes CSS
+│   ├── directives-legales.md          # 3 règles bloquantes
+│   └── template-composition.html      # Squelette 4 scènes (GSAP)
 └── README.md
 ```
 

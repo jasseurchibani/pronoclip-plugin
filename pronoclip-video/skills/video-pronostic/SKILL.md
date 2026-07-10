@@ -45,7 +45,7 @@ de générer** et demander les informations manquantes.
 | Compétition | **Obligatoire** | ex. « Ligue des Champions » |
 | Date/heure du match | **Obligatoire** | ex. « 12/07 21:00 » |
 | Pseudo à afficher | Optionnel | affiché sur le carton final |
-| Style graphique | Optionnel | `réaliste-stylisé`, `cartoon`, `néon`, `rétro` — **défaut : `néon`** (cohérent avec la charte PronoClip) |
+| Style graphique | Optionnel | `réaliste-stylisé`, `cartoon`, `néon`, `rétro` — **défaut : `style_defaut` de `./pronoclip-data/config.json`** (`néon` à l'installation, cohérent avec la charte PronoClip) |
 | Format | Optionnel | `9:16` (**défaut**, TikTok/Reels), `1:1`, `16:9` |
 | Durée | Optionnel | 5 à 15 s |
 
