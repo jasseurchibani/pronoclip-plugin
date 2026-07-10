@@ -1,0 +1,6 @@
+# Artefacts d'exécution des routines PronoClip (jamais versionnés)
+pronoclip-output/
+pronoclip-logs/
+pronoclip-data/
+.media/
+node_modules/
