@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<title>PronoClip — template composition score exact</title>
+<!--
+  ============================================================================
+  TEMPLATE COMPOSITION PRONOCLIP — score exact
+  ============================================================================
+  Squelette HyperFrames : 4 scènes sur ~12 s. À adapter via le skill
+  /hyperframes (authoring) ; animations via /gsap (défaut) ou /css-animations.
+
+  RÈGLES (voir reference/directives-legales.md) :
+  - AUCUN logo de club, emblème de compétition, ni visage de joueur
+    identifiable. Silhouettes + aplats de couleurs de maillot uniquement.
+  - La mention "Pronostic — contenu généré par IA" (.mention-ia) doit rester
+    visible — ne jamais l'animer vers une opacité 0.
+
+  PERSONNALISATION : tout passe par les variables CSS de :root et les
+  éléments [data-field]. Ne rien coder en dur dans les scènes.
+  ============================================================================
+-->
+<style>
+  :root {
+    /* ------- Couleurs des équipes (injectées par le skill, JAMAIS en dur dans les scènes) ------- */
+    --color-home: #004170;        /* couleur maillot équipe domicile */
+    --color-home-accent: #da291c; /* accent maillot domicile (bande, col…) */
+    --color-away: #ffffff;        /* couleur maillot équipe extérieur */
+    --color-away-accent: #febe10; /* accent maillot extérieur */
+
+    /* ------- Thème par style graphique (défaut : néon, charte PronoClip) ------- */
+    --bg: #0a0a14;                /* fond global */
+    --fg: #f4f4ff;                /* texte principal */
+    --accent: #00ffd0;            /* accent néon PronoClip */
+    --glow: 0 0 18px var(--accent);
+
+    /* ------- Format : 9:16 par défaut (TikTok/Reels). 1:1 → 1080x1080 ; 16:9 → 1920x1080 ------- */
+    --video-w: 1080px;
+    --video-h: 1920px;
+
+    /* ------- Typo ------- */
+    --font-display: "Archivo Black", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+  }
+
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+
+  /* Chaque scène occupe tout le cadre ; GSAP gère l'enchaînement (opacity/transform). */
+  .scene {
+    position: absolute; inset: 0;
+    width: var(--video-w); height: var(--video-h);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; /* révélée par la timeline GSAP */
+  }
+  .scene--active { opacity: 1; } /* utile pour itérer scène par scène en preview */
+
+  .mention-ia {
+    position: absolute; bottom: 4%; left: 50%; transform: translateX(-50%);
+    font-size: 28px; letter-spacing: 0.04em; opacity: 0.9;
+    /* NE JAMAIS masquer : obligation de transparence (directives-legales.md, règle 2) */
+  }
+
+  /* Maillot générique : aplat de couleur, SANS écusson ni sponsor (règle 1) */
+  .maillot { width: 320px; height: 380px; border-radius: 24px 24px 48px 48px; }
+  .maillot--home { background: var(--color-home); border: 10px solid var(--color-home-accent); }
+  .maillot--away { background: var(--color-away); border: 10px solid var(--color-away-accent); }
+
+  .score { font-family: var(--font-display); font-size: 220px; text-shadow: var(--glow); }
+  .equipe-nom { font-family: var(--font-display); font-size: 64px; }
+  .competition { font-size: 40px; color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ==========================================================================
+     SCÈNE 1 — INTRO AMBIANCE STADE (0 s → 2 s)
+     Fond stade abstrait : projecteurs, gradins en silhouettes, halos néon.
+     Pas d'images réelles de stades identifiables. GSAP : fade-in + zoom lent.
+     ========================================================================== -->
+<section class="scene scene-intro" data-scene="1" data-start="0" data-end="2">
+  <div class="stade-silhouette"><!-- silhouettes de gradins / projecteurs (SVG génériques) --></div>
+  <p class="competition" data-field="competition">Ligue des Champions</p>
+  <p data-field="date-match">12/07 — 21:00</p>
+</section>
+
+<!-- ==========================================================================
+     SCÈNE 2 — RÉVÉLATION DES ÉQUIPES (2 s → 5 s)
+     Deux maillots en aplats de couleurs (variables CSS), SANS logo ni visage.
+     GSAP : slide-in domicile depuis la gauche, extérieur depuis la droite,
+     puis "VS" en punch scale au centre.
+     ========================================================================== -->
+<section class="scene scene-equipes" data-scene="2" data-start="2" data-end="5">
+  <div class="cote cote--home">
+    <div class="maillot maillot--home"></div>
+    <p class="equipe-nom" data-field="equipe-home">PSG</p>
+  </div>
+  <div class="vs">VS</div>
+  <div class="cote cote--away">
+    <div class="maillot maillot--away"></div>
+    <p class="equipe-nom" data-field="equipe-away">Real Madrid</p>
+  </div>
+</section>
+
+<!-- ==========================================================================
+     SCÈNE 3 — COMPTEUR VERS LE SCORE PRONOSTIQUÉ (5 s → 9 s)
+     GSAP anime chaque chiffre de 0 vers data-target (snap: 1), avec un
+     dernier "tick" appuyé sur la valeur finale + flash néon.
+     ========================================================================== -->
+<section class="scene scene-score" data-scene="3" data-start="5" data-end="9">
+  <div class="score">
+    <span class="score-chiffre" data-field="score-home" data-target="2">0</span>
+    <span class="score-sep">–</span>
+    <span class="score-chiffre" data-field="score-away" data-target="1">0</span>
+  </div>
+  <p class="competition" data-field="competition">Ligue des Champions</p>
+</section>
+
+<!-- ==========================================================================
+     SCÈNE 4 — CARTON FINAL + CTA (9 s → 12 s)
+     Signature "Pronostic de @pseudo — PronoClip" + CTA. Si aucun pseudo :
+     masquer .signature-pseudo et garder "PronoClip" seul.
+     GSAP : fade-in du carton, pulse léger sur le CTA jusqu'à la fin.
+     ========================================================================== -->
+<section class="scene scene-final" data-scene="4" data-start="9" data-end="12">
+  <p class="signature">
+    Pronostic de <span class="signature-pseudo" data-field="pseudo">@pseudo</span> — <strong>PronoClip</strong>
+  </p>
+  <p class="cta" data-field="cta">Ton prono ? Dis-le en commentaire ⚽</p>
+</section>
+
+<!-- Mention de transparence : hors des scènes, visible en permanence (règle 2) -->
+<p class="mention-ia">Pronostic — contenu généré par IA</p>
+
+<!-- ==========================================================================
+     TIMELINE GSAP
+     Le chargement de GSAP (inline / bundle local) et les helpers HyperFrames
+     sont gérés par les skills /hyperframes et /gsap — voir /hyperframes-cli
+     pour la boucle preview → lint → render.
+     ========================================================================== -->
+<script>
+  // const tl = gsap.timeline();
+  // Scène 1 (0–2 s)  : tl.to('.scene-intro',   { opacity: 1, duration: 0.4 }, 0)   … sortie à 2 s
+  // Scène 2 (2–5 s)  : slide-in .cote--home / .cote--away, punch sur .vs
+  // Scène 3 (5–9 s)  : compteur — gsap.to('.score-chiffre', { innerText: el.dataset.target, snap: { innerText: 1 } })
+  // Scène 4 (9–12 s) : fade-in .scene-final, pulse en boucle sur .cta
+  // IMPORTANT : ne jamais animer .mention-ia vers opacity 0 (règle 2).
+</script>
+
+</body>
+</html>
