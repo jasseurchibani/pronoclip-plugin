@@ -12,10 +12,11 @@ Orchestre la production de toutes les vidéos de pronostics d'une journée de
 compétition, en 5 phases calquées sur le LOOP ENGINE :
 **Sense → Plan → Act → Feed → Report**.
 
-Cette routine ne génère rien elle-même : elle pilote les skills
-`video-pronostic` (rendu) et `publication-cms` (publication), et s'appuie sur
-le MCP **RapidoRh** pour le suivi des tâches. Lire la section **Garde-fous**
-avant toute exécution.
+Cette routine ne génère rien elle-même : elle dispatche le subagent
+`video-composer` (rendu, parallélisable) et le skill `publication-cms`
+(publication), et s'appuie sur le MCP **RapidoRh** pour le suivi des tâches.
+Pour une vidéo unique hors routine, c'est le skill `video-pronostic` qui
+s'applique. Lire la section **Garde-fous** avant toute exécution.
 
 ## Phase 1 — SENSE : récupérer les matchs
 
@@ -57,22 +58,29 @@ Format du fichier `matchs-{date}.json` :
    **Aucune génération avant validation explicite.** Sans « GO » (ou
    équivalent clair), s'arrêter là.
 
-## Phase 3 — ACT : produire et publier, match par match
+## Phase 3 — ACT : composition en parallèle, Kanban en séquentiel
 
-Traiter les tâches **dans l'ordre des coups d'envoi**. Pour chaque match :
+La composition vidéo est **parallélisée** via le subagent
+**`video-composer`** (un agent par match, voir `agents/video-composer.md`) ;
+tous les mouvements Kanban et la publication restent **séquentiels**.
 
-1. Déplacer la tâche en **Doing** (`move-task`) ;
-2. Invoquer le skill **`video-pronostic`** avec le brief (équipes, score,
-   compétition, kickoff, couleurs, style, format) ;
-3. Invoquer le skill **`publication-cms`** pour uploader la vidéo et
-   planifier le brouillon de post ;
-4. Déplacer la tâche en **Done**.
+Traiter les matchs **dans l'ordre des coups d'envoi**, par **lots de 3
+compositions simultanées maximum** :
 
-**En cas d'échec sur un match** :
-
-- logger l'erreur (voir Phase 4) ;
-- laisser la tâche en **Doing** avec un commentaire décrivant l'échec ;
-- **PASSER AU MATCH SUIVANT** — un échec ne bloque jamais la routine.
+1. **Dispatch du lot** — pour chaque match du lot, séquentiellement :
+   déplacer sa tâche en **Doing** (`move-task`) ; puis lancer **en
+   parallèle** un subagent `video-composer` par match, avec le brief JSON
+   (home, away, score, compétition, kickoff, couleurs, pseudo, style,
+   format, durée).
+2. **Collecte** — attendre la fin du lot ; chaque subagent retourne son JSON
+   contractuel `{status, mp4_path, duration_s, match, error?}`.
+3. **Suite séquentielle**, match par match dans l'ordre du lot :
+   - `status: "OK"` → invoquer le skill **`publication-cms`** (upload +
+     planification du brouillon), puis déplacer la tâche en **Done** ;
+   - `status: "KO"` → logger l'erreur (voir Phase 4), laisser la tâche en
+     **Doing** avec un commentaire décrivant l'échec (`error` du JSON), et
+     **PASSER AU MATCH SUIVANT** — un échec ne bloque jamais la routine.
+4. Passer au lot suivant.
 
 ## Phase 4 — FEED : compléter le log du jour
 
@@ -104,6 +112,8 @@ Ce log est la matière première du skill de dailies (`/pronoclip-daily`).
 - **Jamais de planification CMS à moins de 2 h du coup d'envoi** : la vidéo
   doit sortir **AVANT** le match. Si le créneau viable est déjà passé ou trop
   proche, ne pas planifier le post ; le signaler dans le log et le rapport.
-- Les garde-fous du skill `video-pronostic` s'appliquent à chaque vidéo
-  (pas de logos ni visages, mention IA, rendu local uniquement — jamais le
-  fallback MCP payant dans cette routine).
+- **Max 3 compositions simultanées** : jamais plus de 3 subagents
+  `video-composer` en parallèle, quel que soit le nombre de matchs.
+- Les garde-fous de `video-pronostic` et les interdits de `video-composer`
+  s'appliquent à chaque vidéo (pas de logos ni visages, mention IA, rendu
+  local uniquement — jamais le fallback MCP payant dans cette routine).
