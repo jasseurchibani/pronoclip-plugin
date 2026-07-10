@@ -46,10 +46,11 @@ S'applique sur une composition produite par `video-pronostic` ou
   | punchline | 9–12 s | punchline + CTA |
 
 - **Ton** : commentateur sportif énergique, complice. **Français par
-  défaut** — lire `langue_captions` dans `./pronoclip-data/config.json`.
+  défaut** — lire `langue_narration` dans `./pronoclip-data/config.json`.
 - Partir des **gabarits** de `reference/scripts-narration.md` : 3 registres
-  (hype, analyse froide, humour) × FR/EN, variables `{home}` `{away}`
-  `{score}` `{pseudo}`.
+  (hype, analyse froide, humour — registre par défaut : `narration_style`
+  de `config.json`) × FR/EN, variables `{home}` `{away}` `{score}`
+  `{pseudo}`.
 - **Toujours** inclure la transparence « pronostic généré par IA » —
   oralement (tag de fin de script) ou visuellement (mention à l'écran du
   template, déjà obligatoire).
@@ -63,8 +64,10 @@ S'applique sur une composition produite par `video-pronostic` ou
 | 3 | **HeyGen Starfish** | utilisateur connecté (`npx hyperframes auth`) **ET** demande explicite | compte HeyGen |
 
 - Pour ElevenLabs : **figer la voix par défaut dans `config.json`**
-  (`tts_voice_id`) pour une identité sonore constante ; **logger le nombre
-  de caractères envoyés** à chaque appel (API payante au caractère).
+  (`elevenlabs_voice_id`) pour une identité sonore constante ; **logger le
+  nombre de caractères envoyés** à chaque appel (API payante au caractère).
+  La clé `ELEVENLABS_API_KEY` vit dans l'environnement, **jamais dans
+  `config.json`**.
 - **La routine ne DOIT JAMAIS basculer silencieusement sur un provider
   payant** : Kokoro par défaut ; payant = choix explicite dans
   `config.json` ou en session.
@@ -80,11 +83,11 @@ S'applique sur une composition produite par `video-pronostic` ou
    → WAV dans `.media/vo/`, **un fichier par beat** (pattern per-beat VO
    des launch videos HyperFrames), nommage `{scene}_{n}.wav`.
 
-2. **Musique de fond** — au choix :
-   - générée : `npx hyperframes bgm` avec le mood
+2. **Musique de fond** — selon `bgm_provider` de `config.json` :
+   - `musicgen` / `lyria` : `npx hyperframes bgm` avec le mood
      `"stadium energy, driving percussion, rising tension"` pour le
      registre hype ;
-   - catalogue : via `/media-use`.
+   - `catalogue` : via `/media-use`.
 
    **Règle de mixage** : BGM ducké sous la VO — **VO à −3 dB, BGM à
    −14 dB sous la voix**.

@@ -114,6 +114,11 @@ Tests de recette à dérouler avant toute mise en production chez un client :
 | 2 | `/pronoclip-routine demain` | Le plan (N matchs → N tâches → GO ?) est présenté **avant** toute génération ; les tâches sont créées dans les **bonnes colonnes** Kanban ; les posts sont planifiés avec `post_heure` au format **HH:MM:SS**, dans la fenêtre H-6 → H-2. |
 | 3 | `/pronoclip-daily` | Un daily **unique** est créé (pas de doublon si relancé) ; les heures sont cohérentes avec les durées des logs (somme arrondie au 0,5 h). |
 | 4 | Cas d'échec : match sans couleurs connues | Les couleurs **par défaut** du template sont appliquées ; l'échec éventuel est loggé en **KO** ; la routine **continue** sur les matchs suivants sans blocage. |
+| 5 | `/pronoclip-match PSG Real 2-1` (mode standard) | Vidéo avec **4 séquences animées**, VO **Kokoro FR**, BGM, **captions karaoké** ; aucune image avec logo ou visage identifiable. |
+| 6 | Même commande avec `tts_provider: "elevenlabs"` en config | Voix **ElevenLabs** utilisée (`elevenlabs_voice_id` de la config) ; le **nombre de caractères envoyés est loggé**. |
+| 7 | `/pronoclip-routine demain` avec `mode_routine: "light"` | Vidéos **sans images ni audio** (template texte + formes) ; temps de production nettement réduit. |
+| 8 | Demande « ajoute un présentateur » | **Annonce du coût HeyGen** puis **attente d'une confirmation explicite** avant tout appel API ; aucun appel sans OUI. |
+| 9 | Image générée avec un logo visible | **Retry automatique** avec negative renforcé (max 2), puis **fallback dégradé charte** ; l'incident est loggé. |
 
 ## Structure du plugin
 

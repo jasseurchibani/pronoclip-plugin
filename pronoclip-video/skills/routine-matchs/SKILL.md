@@ -34,7 +34,11 @@ revendable en changeant ce seul fichier).
 3. **Compétitions suivies** (défaut : Ligue des Champions, Ligue Europa,
    Euro) ;
 4. **Style par défaut** (défaut : `néon`), **fenêtre de publication**
-   (défaut : H-6 → H-2) et **langue des captions** (défaut : `fr`).
+   (défaut : H-6 → H-2) et **langue des captions** (défaut : `fr`) ;
+5. **Audio/visuel** — provider TTS (défaut : `kokoro`, le seul gratuit),
+   registre de narration, langue de narration, provider BGM, nombre de
+   séquences par vidéo, avatar présentateur (défaut : `false`, payant),
+   mode de routine (défaut : `standard`).
 
 Schéma canonique du fichier (source de vérité pour TOUS les skills) :
 
@@ -58,9 +62,32 @@ Schéma canonique du fichier (source de vérité pour TOUS les skills) :
   "competitions": ["Ligue des Champions", "Ligue Europa", "Euro"],
   "style_defaut": "néon",
   "fenetre_publication": { "max_avant_kickoff_h": 6, "min_avant_kickoff_h": 2 },
-  "langue_captions": "fr"
+  "langue_captions": "fr",
+  "tts_provider": "kokoro",
+  "elevenlabs_voice_id": null,
+  "narration_style": "hype",
+  "langue_narration": "fr",
+  "bgm_provider": "musicgen",
+  "sequences_par_video": 4,
+  "avatar_presentateur": false,
+  "mode_routine": "standard"
 }
 ```
+
+Valeurs admises pour le bloc audio/visuel :
+
+| Clé | Valeurs | Note |
+|---|---|---|
+| `tts_provider` | `kokoro` \| `elevenlabs` \| `heygen` | seuls `elevenlabs`/`heygen` sont payants (opt-in) |
+| `elevenlabs_voice_id` | id de voix ou `null` | fige l'identité sonore ElevenLabs |
+| `narration_style` | `hype` \| `analyse` \| `humour` | gabarits de `scripts-narration.md` |
+| `bgm_provider` | `musicgen` \| `lyria` \| `catalogue` | musique générée ou catalogue licencié |
+| `avatar_presentateur` | `false` \| `true` | `true` = HeyGen payant, opt-in explicite |
+| `mode_routine` | `standard` \| `light` | `light` = sans images ni audio (tests, journées chargées) |
+
+⚠️ **Les clés API (`ELEVENLABS_API_KEY`, `HEYGEN_API_KEY`) restent dans
+l'environnement — JAMAIS dans `config.json`** : ce fichier est versionnable
+et revendable, il ne doit contenir aucun secret.
 
 ## Phase 1 — SENSE : récupérer les matchs
 
@@ -116,7 +143,9 @@ compositions simultanées maximum** :
    déplacer sa tâche en **Doing** (`move-task`) ; puis lancer **en
    parallèle** un subagent `video-composer` par match, avec le brief JSON
    (home, away, score, compétition, kickoff, couleurs, pseudo, style,
-   format, durée).
+   format, durée, `mode` repris de `mode_routine` dans `config.json`).
+   Le flag `premium: true` n'est posé dans un brief **qu'après confirmation
+   humaine explicite** — jamais par la routine elle-même.
 2. **Collecte** — attendre la fin du lot ; chaque subagent retourne son JSON
    contractuel `{status, mp4_path, duration_s, match, error?}`.
 3. **Suite séquentielle**, match par match dans l'ordre du lot :

@@ -49,37 +49,50 @@ de générer** et demander les informations manquantes.
 | Format | Optionnel | `9:16` (**défaut**, TikTok/Reels), `1:1`, `16:9` |
 | Durée | Optionnel | 5 à 15 s |
 
-## Étape 2 — Composition (HTML → vidéo)
+## Étape 2 — Composition : pipeline enrichi (mode standard)
 
-Partir de `${CLAUDE_PLUGIN_ROOT}/reference/template-composition.html`, qui
-définit les 4 scènes :
+Mode par défaut (`mode_routine: "standard"` dans `config.json`) :
 
-| Scène | Fenêtre | Contenu |
-|---|---|---|
-| 1. Intro | 0–2 s | ambiance stade |
-| 2. Équipes | 2–5 s | révélation des deux équipes en **couleurs de maillot, SANS logo** |
-| 3. Score | 5–9 s | compteur animé vers le score pronostiqué |
-| 4. Carton final | 9–12 s | « Pronostic de @pseudo — PronoClip » + CTA |
+a. **Invoquer le skill `sequences-match`** → 3–5 plans de match animés
+   (nombre : `sequences_par_video` de `config.json`) ;
+b. **Invoquer le skill `audio-narration`** → VO + BGM + captions karaoké ;
+c. **Assembler** dans
+   `${CLAUDE_PLUGIN_ROOT}/reference/template-composition.html` :
 
-Textes à l'écran (tous obligatoires) :
+   | Scène | Fenêtre | Assemblage |
+   |---|---|---|
+   | 1. Intro | 0–2 s | plan AMBIANCE animé |
+   | 2. Équipes | 2–5 s | plan FACE-À-FACE animé, noms d'équipes par-dessus |
+   | 3. Score | 5–9 s | le **compteur de score animé reste par-dessus** le plan ACTION |
+   | 4. Carton final | 9–12 s | carton « Pronostic de @pseudo — PronoClip » + CTA **sur** le plan TIFO/CÉLÉBRATION |
 
-- noms des équipes ;
-- score pronostiqué ;
-- compétition ;
-- mention **« Pronostic — contenu généré par IA »** (obligation de
-  transparence du cahier des charges PronoClip).
+   Textes à l'écran (tous obligatoires) : noms des équipes, score
+   pronostiqué, compétition, mention **« Pronostic — contenu généré par
+   IA »** (obligation de transparence du cahier des charges PronoClip).
+   Les couleurs des équipes sont passées en **variables CSS**
+   (`--color-home`, `--color-away`, …) — jamais en dur dans les scènes.
 
-Les couleurs des équipes sont passées en **variables CSS**
-(`--color-home`, `--color-away`, …) — ne jamais coder les couleurs en dur
-dans les scènes.
+d. **Contrôles puis rendu** : voir Étape 3 (`lint` + `validate` +
+   `animation-map`, puis render local).
 
-## Étape 3 — Rendu local (CLI HyperFrames)
+### Mode `--light` (fallback rapide)
+
+La composition « texte + formes » d'origine — le template seul, sans images
+`sequences-match` ni audio `audio-narration` : intro ambiance en formes CSS,
+maillots en aplats, compteur, carton final. À utiliser pour **les tests** et
+**les jours à 10 matchs**. Activation : flag `--light` en session, ou
+`mode_routine: "light"` dans `config.json`.
+
+## Étape 3 — Contrôles et rendu local (CLI HyperFrames)
 
 Rappel : le repo HyperFrames utilise **bun, jamais pnpm**.
 
 1. `hyperframes preview` — itérer sur la composition jusqu'à validation ;
-2. `hyperframes lint` — obligatoire avant le rendu ;
-3. `hyperframes render` — produit le MP4 dans `./pronoclip-output/`.
+2. `hyperframes lint` **ET** `hyperframes validate` — les deux doivent
+   passer avant tout rendu ;
+3. `animation-map` (mode standard) — corriger tout flag `offscreen`,
+   `collision`, `paced-fast` ;
+4. `hyperframes render` — produit le MP4 dans `./pronoclip-output/`.
 
 Nommage du fichier de sortie :
 
