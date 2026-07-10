@@ -4,8 +4,9 @@ Plugin Claude Code pour la génération de **vidéos de pronostics football (sco
 rendu vidéo en local avec **HyperFrames**, planification des routines par **journée de matchs**
 via **RapidoRH**, publication via **RapidoCMS**, et transformation des logs d'exécution en **dailies**.
 
-> Version 0.1.0 — squelette. Les commandes, skills et agents seront ajoutés dans les
-> prochaines itérations ; ce README fixe les prérequis et l'architecture cible.
+> Version 0.2.0 — plugin fonctionnellement complet (3 commandes, 6 skills,
+> 1 subagent, 5 références). Passage en 1.0.0 après validation de la
+> section « Recette ».
 
 ---
 
@@ -52,13 +53,22 @@ Par défaut, toutes les routines par journée de matchs utilisent le rendu local
 
 ## Commandes
 
-| Commande | Phase(s) | Description |
-|---|---|---|
-| `/pronoclip-video:planifier-journee` | Sense → Plan | Détecte la prochaine journée de matchs, sélectionne les affiches, crée le projet / les tâches RapidoRH et programme la routine de production. |
-| `/pronoclip-video:generer-video` | Act | Génère la vidéo de pronostic (score exact) pour un match ou une journée : composition HTML/GSAP puis rendu **local** via le CLI HyperFrames. |
-| `/pronoclip-video:publier-dailies` | Feed → Report | Publie ou planifie les vidéos via RapidoCMS, puis transforme les logs d'exécution en **dailies** RapidoRH. |
+| Commande | Phase(s) | Skill sous-jacent | Description |
+|---|---|---|---|
+| `/pronoclip-match` | Act | `video-pronostic` | Génère UNE vidéo de pronostic (score exact) : composition HTML/GSAP puis rendu **local** via le CLI HyperFrames. Ex. : `/pronoclip-match PSG Real 2-1 néon`. |
+| `/pronoclip-routine` | Sense → Report | `routine-matchs` | Traite une journée complète : détection des matchs, tâches RapidoRH, validation GO, compositions en parallèle (`video-composer`), publication CMS, log. Ex. : `/pronoclip-routine demain`. |
+| `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). |
 
-*(Squelette : le contenu des commandes/skills n'est pas encore implémenté.)*
+
+## Configuration
+
+Toute la configuration client vit dans **`./pronoclip-data/config.json`**
+(CONFIG swappable) : `company_id` CMS, comptes sociaux, IDs projet/colonnes
+RapidoRH, compétitions suivies, style par défaut, fenêtre de publication
+(H-6 → H-2), langue des captions. Le fichier est créé au premier lancement
+par le mini-flow d'onboarding de `/pronoclip-routine` (skill
+`routine-matchs`, Phase 0) — aucun skill ne code ces valeurs en dur, le
+plugin se revend en changeant ce seul fichier.
 
 ---
 
@@ -94,16 +104,47 @@ Cycle appliqué à chaque **journée de matchs** :
 
 ---
 
+## Recette
+
+Tests de recette à dérouler avant toute mise en production chez un client :
+
+| # | Test | Critères de succès |
+|---|---|---|
+| 1 | `/pronoclip-match PSG Real 2-1 néon` | MP4 rendu **localement** dans `./pronoclip-output/` ; `hyperframes lint` OK ; mention « généré par IA » visible ; **aucun logo** de club ni de compétition. |
+| 2 | `/pronoclip-routine demain` | Le plan (N matchs → N tâches → GO ?) est présenté **avant** toute génération ; les tâches sont créées dans les **bonnes colonnes** Kanban ; les posts sont planifiés avec `post_heure` au format **HH:MM:SS**, dans la fenêtre H-6 → H-2. |
+| 3 | `/pronoclip-daily` | Un daily **unique** est créé (pas de doublon si relancé) ; les heures sont cohérentes avec les durées des logs (somme arrondie au 0,5 h). |
+| 4 | Cas d'échec : match sans couleurs connues | Les couleurs **par défaut** du template sont appliquées ; l'échec éventuel est loggé en **KO** ; la routine **continue** sur les matchs suivants sans blocage. |
+| 5 | `/pronoclip-match PSG Real 2-1` (mode standard) | Vidéo avec **4 séquences animées**, VO **Kokoro FR**, BGM, **captions karaoké** ; aucune image avec logo ou visage identifiable. |
+| 6 | Même commande avec `tts_provider: "elevenlabs"` en config | Voix **ElevenLabs** utilisée (`elevenlabs_voice_id` de la config) ; le **nombre de caractères envoyés est loggé**. |
+| 7 | `/pronoclip-routine demain` avec `mode_routine: "light"` | Vidéos **sans images ni audio** (template texte + formes) ; temps de production nettement réduit. |
+| 8 | Demande « ajoute un présentateur » | **Annonce du coût HeyGen** puis **attente d'une confirmation explicite** avant tout appel API ; aucun appel sans OUI. |
+| 9 | Image générée avec un logo visible | **Retry automatique** avec negative renforcé (max 2), puis **fallback dégradé charte** ; l'incident est loggé. |
+
 ## Structure du plugin
 
 ```
 pronoclip-video/
 ├── .claude-plugin/
-│   └── plugin.json      # Manifeste du plugin
-├── commands/            # Slash commands (à venir)
-├── skills/              # Skills (à venir)
-├── agents/              # Agents spécialisés (à venir)
-├── reference/           # Documentation de référence (à venir)
+│   └── plugin.json                    # Manifeste du plugin
+├── commands/
+│   ├── pronoclip-match.md             # /pronoclip-match → skill video-pronostic
+│   ├── pronoclip-routine.md           # /pronoclip-routine → skill routine-matchs
+│   └── pronoclip-daily.md             # /pronoclip-daily → skill suivi-rh-daily (B)
+├── skills/
+│   ├── video-pronostic/SKILL.md       # Une vidéo : brief → composition → rendu local
+│   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
+│   ├── publication-cms/SKILL.md       # Upload, brouillon, planification, campagne
+│   ├── audio-narration/SKILL.md       # Voix off TTS, BGM, SFX, captions karaoké
+│   ├── sequences-match/SKILL.md       # Images RapidoCMS → mini-séquences animées
+│   └── suivi-rh-daily/SKILL.md        # Kanban RapidoRH + dailies
+├── agents/
+│   └── video-composer.md              # Subagent de composition (parallélisable, max 3)
+├── reference/
+│   ├── charte-pronoclip.md            # Identité visuelle/éditoriale, captions, thèmes CSS
+│   ├── directives-legales.md          # 3 règles bloquantes
+│   ├── prompts-sequences.md           # Prompts generate_image des 5 plans de match
+│   ├── scripts-narration.md           # Gabarits de VO (hype/analyse/humour × FR/EN)
+│   └── template-composition.html      # Squelette 4 scènes (GSAP)
 └── README.md
 ```
 
