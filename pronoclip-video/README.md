@@ -127,12 +127,14 @@ pronoclip-video/
 │   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
 │   ├── publication-cms/SKILL.md       # Upload, brouillon, planification, campagne
 │   ├── audio-narration/SKILL.md       # Voix off TTS, BGM, SFX, captions karaoké
+│   ├── sequences-match/SKILL.md       # Images RapidoCMS → mini-séquences animées
 │   └── suivi-rh-daily/SKILL.md        # Kanban RapidoRH + dailies
 ├── agents/
 │   └── video-composer.md              # Subagent de composition (parallélisable, max 3)
 ├── reference/
 │   ├── charte-pronoclip.md            # Identité visuelle/éditoriale, captions, thèmes CSS
 │   ├── directives-legales.md          # 3 règles bloquantes
+│   ├── prompts-sequences.md           # Prompts generate_image des 5 plans de match
 │   ├── scripts-narration.md           # Gabarits de VO (hype/analyse/humour × FR/EN)
 │   └── template-composition.html      # Squelette 4 scènes (GSAP)
 └── README.md
