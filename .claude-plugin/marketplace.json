@@ -1,0 +1,8 @@
+{
+  "name": "pronoclip",
+  "owner": { "name": "BraindCode" },
+  "metadata": { "description": "Plugins PronoClip : vidéos de pronostics football pilotées par les MCP Rapido" },
+  "plugins": [
+    { "name": "pronoclip-video", "source": "./pronoclip-video", "description": "Vidéos de pronostics football (score exact) rendues en local avec HyperFrames, routines par journée de matchs via RapidoRH, publication RapidoCMS, logs transformés en dailies" }
+  ]
+}
