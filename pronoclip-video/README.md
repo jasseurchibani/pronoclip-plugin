@@ -4,9 +4,9 @@ Plugin Claude Code pour la génération de **vidéos de pronostics football (sco
 rendu vidéo en local avec **HyperFrames**, planification des routines par **journée de matchs**
 via **RapidoRH**, publication via **RapidoCMS**, et transformation des logs d'exécution en **dailies**.
 
-> Version 0.3.0 — plugin fonctionnellement complet (4 commandes, 7 skills,
-> 4 agents dont l'équipe studio-cartoon, 6 références). Passage en 1.0.0
-> après validation de la section « Recette ».
+> Version 0.4.0 — plugin fonctionnellement complet (5 commandes, 8 skills
+> dont le présentateur animé HeyGen, 4 agents dont l'équipe studio-cartoon,
+> 6 références). Passage en 1.0.0 après validation de la section « Recette ».
 
 ---
 
@@ -18,6 +18,21 @@ via **RapidoRH**, publication via **RapidoCMS**, et transformation des logs d'ex
 | **MCP RapidoRh** | Projets, tâches et **dailies** par journée de matchs | Oui |
 | **Node ≥ 20** | Exécution des CLI (`npx skills`, tooling HyperFrames) | Oui |
 | **bun** | Gestionnaire de paquets / runtime du repo HyperFrames | Oui (pour le rendu vidéo) |
+
+### HeyGen — présentateur animé qui parle (option premium, PAYANT)
+
+Débloqué via le skill `presentateur-heygen` : l'API HeyGen **Talking Photo**
+anime un portrait de présentateur cartoon (humain, jamais un joueur réel)
+qui **parle** avec une voix française, pour annoncer un pronostic.
+
+- Flux : `remaining_quota` → upload `talking_photo` → `video/generate`
+  (payant) → poll `video_status.get` → download.
+- **Facturation au temps : ~1 crédit HeyGen par seconde de vidéo.**
+- Clé `HEYGEN_API_KEY` **dans l'environnement uniquement**, jamais dans un
+  fichier versionné.
+- **OUI explicite sur le coût avant chaque rendu** ; jamais dans une routine
+  automatisée. Pour une simple voix off sans visage, préférer
+  `audio-narration` (Kokoro, gratuit et local).
 
 ### HyperFrames — rendu vidéo EN LOCAL (voie principale)
 
@@ -59,6 +74,7 @@ Par défaut, toutes les routines par journée de matchs utilisent le rendu local
 | `/pronoclip-routine` | Sense → Report | `routine-matchs` | Traite une journée complète : détection des matchs, tâches RapidoRH, validation GO, compositions en parallèle (`video-composer`), publication CMS, log. Ex. : `/pronoclip-routine demain`. |
 | `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). |
 | `/pronoclip-cartoon` | Act | `studio-cartoon` | Version **dessin animé** d'un match ou de la journée : équipe d'agents scénariste → directeur artistique → compositeur → vérificateur légal. Ex. : `/pronoclip-cartoon PSG Real 2-1` ou `/pronoclip-cartoon demain`. |
+| `/pronoclip-presentateur` | Act | `presentateur-heygen` | **Présentateur cartoon animé qui parle** (HeyGen Talking Photo), voix FR. **PAYANT** (~1 crédit/s), opt-in avec confirmation du coût. |
 
 ## Équipe d'agents — studio cartoon
 
@@ -158,11 +174,13 @@ pronoclip-video/
 │   ├── pronoclip-match.md             # /pronoclip-match → skill video-pronostic
 │   ├── pronoclip-routine.md           # /pronoclip-routine → skill routine-matchs
 │   ├── pronoclip-daily.md             # /pronoclip-daily → skill suivi-rh-daily (B)
-│   └── pronoclip-cartoon.md           # /pronoclip-cartoon → skill studio-cartoon
+│   ├── pronoclip-cartoon.md           # /pronoclip-cartoon → skill studio-cartoon
+│   └── pronoclip-presentateur.md      # /pronoclip-presentateur → skill presentateur-heygen
 ├── skills/
 │   ├── video-pronostic/SKILL.md       # Une vidéo : brief → composition → rendu local
 │   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
 │   ├── studio-cartoon/SKILL.md        # Équipe d'agents : version dessin animé d'un match
+│   ├── presentateur-heygen/SKILL.md   # Présentateur cartoon animé qui parle (HeyGen, payant)
 │   ├── publication-cms/SKILL.md       # Upload, brouillon, planification, campagne
 │   ├── audio-narration/SKILL.md       # Voix off TTS, BGM, SFX, captions karaoké
 │   ├── sequences-match/SKILL.md       # Images RapidoCMS → mini-séquences animées

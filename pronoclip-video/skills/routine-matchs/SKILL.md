@@ -79,6 +79,7 @@ Valeurs admises pour le bloc audio/visuel :
 | Clé | Valeurs | Note |
 |---|---|---|
 | `tts_provider` | `kokoro` \| `elevenlabs` \| `heygen` | seuls `elevenlabs`/`heygen` sont payants (opt-in) |
+| `heygen_voice_id` | id voix HeyGen ou `null` | voix FR du présentateur (skill `presentateur-heygen`) |
 | `elevenlabs_voice_id` | id de voix ou `null` | fige l'identité sonore ElevenLabs |
 | `narration_style` | `hype` \| `analyse` \| `humour` | gabarits de `scripts-narration.md` |
 | `bgm_provider` | `musicgen` \| `lyria` \| `catalogue` | musique générée ou catalogue licencié |

@@ -60,6 +60,16 @@ applique le **thème cartoon** de la charte (variables CSS) et les recettes
 d'animation de `storyboard-cartoon.md` (bounce, squash & stretch, wipes),
 puis lint + validate + rendu local.
 
+### Étape 3 bis — Présentateur animé (option premium, PAYANT)
+
+Si le brief porte `premium: true` **et** que l'utilisateur a demandé un
+présentateur/avatar : invoquer le skill **`presentateur-heygen`** pour
+générer un clip de présentateur cartoon qui parle (HeyGen Talking Photo),
+inséré en PiP dans la scène d'ouverture ou de conclusion. Service **payant**
+au temps de rendu (~1 crédit/seconde) : confirmation humaine du coût
+obligatoire, jamais en routine automatisée. Sans `premium: true`, sauter
+cette étape.
+
 ### Étape 4 — Modération (bloquante)
 
 Dispatcher **`verificateur-legal`** avec le chemin du MP4.
