@@ -136,6 +136,12 @@ La composition vidéo est **parallélisée** via le subagent
 **`video-composer`** (un agent par match, voir `agents/video-composer.md`) ;
 tous les mouvements Kanban et la publication restent **séquentiels**.
 
+**Version dessin animé** : si le style demandé est `cartoon` (ou commande
+`/pronoclip-cartoon`), chaque match est confié au skill **`studio-cartoon`**
+(équipe scénariste → directeur artistique → compositeur → vérificateur
+légal) au lieu du `video-composer` seul — même contrat de sortie JSON,
+**max 2 studios en parallèle** au lieu de 3 compositions.
+
 Traiter les matchs **dans l'ordre des coups d'envoi**, par **lots de 3
 compositions simultanées maximum** :
 

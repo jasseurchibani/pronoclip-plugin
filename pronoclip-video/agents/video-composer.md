@@ -38,6 +38,12 @@ Si un champ obligatoire manque (home, away, score, competition, kickoff),
   (template texte + formes seul, ni `sequences-match` ni `audio-narration`).
 - `premium` : posé par l'orchestrateur **uniquement après confirmation
   humaine** — voir Interdits.
+- Champs optionnels posés par le studio cartoon : `storyboard` (JSON du
+  `scenariste-cartoon` — mapper ses scènes sur les fenêtres du template) et
+  `plans` (liste des images gelées par le `directeur-artistique-cartoon` —
+  les utiliser comme fonds de scène). Dans ce cas, appliquer le **thème
+  cartoon** de la charte et les recettes d'animation de
+  `reference/storyboard-cartoon.md` (bounce, squash & stretch, wipes).
 
 ## Procédure
 

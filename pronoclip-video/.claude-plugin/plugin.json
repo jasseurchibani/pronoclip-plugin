@@ -1,6 +1,6 @@
 {
   "name": "pronoclip-video",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Génération de vidéos de pronostics football (score exact) avec HyperFrames, planification de routines par journée de matchs via RapidoRH, publication via RapidoCMS, et transformation des logs en dailies.",
   "author": {
     "name": "BraindCode",
