@@ -3,11 +3,16 @@
   "version": "0.5.0-dev",
   "private": true,
   "type": "module",
-  "description": "Cœur logique (core/) et adaptateurs (adapters/) du plugin pronoclip-video. Squelette Phase 1 — aucune logique métier pour l'instant.",
+  "description": "Cœur logique (core/) et adaptateurs (adapters/) du plugin pronoclip-video.",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "example": "tsx scripts/generate-example.ts"
   },
   "devDependencies": {
-    "typescript": "^5.5.0"
+    "@types/node": "^20.14.0",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
   }
 }

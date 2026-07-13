@@ -112,6 +112,34 @@ par le mini-flow d'onboarding de `/pronoclip-routine` (skill
 `routine-matchs`, Phase 0) — aucun skill ne code ces valeurs en dur, le
 plugin se revend en changeant ce seul fichier.
 
+Deux surfaces de configuration, à ne pas confondre :
+
+| Fichier | Versionné ? | Contenu |
+|---|---|---|
+| `pronoclip.config.json` | oui | config **produit** : marque, couleurs, durée, nb de plans, langue, texte de la mention IA, niveau de rendu, voix. Aucun secret, aucun ID client. |
+| `.env` (voir `.env.example`) | **non** | identifiants et secrets : `RAPIDOCMS_COMPANY_ID`, URLs MCP, clés API. |
+| `./pronoclip-data/config.json` | **non** | données **client** de runtime : comptes sociaux, IDs projet/colonnes RapidoRH (résolus à l'onboarding). |
+
+### Anti-régression : ne laisser fuir aucune donnée client
+
+Un ID d'établissement, un ID projet/colonne ou une URL de tenant codés en dur
+rendent le plugin invendable. Test à faire passer (doit revenir **vide**) :
+
+```sh
+git grep -nE "\"(company_id|projet_id)\"[[:space:]]*:[[:space:]]*[0-9]|foodeatup|https?://[^\" ]*rapido[^\" ]*\.(com|io|app|net)" \
+  -- pronoclip-video ":(exclude)pronoclip-video/README.md"
+```
+
+Le test cible une **affectation** d'ID client (`"company_id": 321`), pas un
+nombre nu — il ignore ainsi `node_modules/` (via `git grep`) et les nombres sans
+rapport. Ce qu'il traque : IDs d'établissement (`321`), IDs projet/colonnes
+(`29`, `101`…) réintroduits en affectation, noms de tenants clients
+(`foodeatup`…) et URLs de services en dur.
+
+**Distinction importante** — `BraindCode` / `braindcode.com` est le **nom de
+l'éditeur** du plugin (`author` dans `plugin.json`), **pas** une donnée client :
+il est **volontairement conservé** et n'est donc **pas** ciblé par ce test.
+
 ---
 
 ## Workflow : Sense → Plan → Act → Feed → Report

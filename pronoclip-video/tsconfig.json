@@ -8,7 +8,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": []
+    "types": ["node"]
   },
-  "include": ["core", "adapters"]
+  "include": ["core", "adapters", "tests", "scripts"]
 }
