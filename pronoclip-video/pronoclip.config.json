@@ -1,0 +1,34 @@
+{
+  "_comment": "Config produit de pronoclip-video — versionnable, sans secret ni identifiant client. Les identifiants (RAPIDOCMS_COMPANY_ID, URLs MCP) et les clés API vivent dans .env (voir .env.example). Les données client de runtime (comptes sociaux, IDs RapidoRH) vivent dans ./pronoclip-data/config.json (jamais versionné). Un revendeur ne modifie que ce fichier + son .env, jamais le code.",
+  "brand": {
+    "name": "PronoClip",
+    "colors": {
+      "background": "#0A0A0A",
+      "accent": "#33D17A"
+    }
+  },
+  "video": {
+    "duration_seconds": 40,
+    "scene_count": 8,
+    "scene_length_seconds": 5,
+    "aspect_ratio": "9:16",
+    "language": "fr"
+  },
+  "render": {
+    "level": "motion",
+    "_levels": ["motion", "animated"]
+  },
+  "ai_disclosure": {
+    "watermark": "Vidéo générée par IA",
+    "end_card": [
+      "Vidéo générée par intelligence artificielle — PronoClip",
+      "Contenu de divertissement. Aucun pari, aucune mise, aucun gain."
+    ],
+    "metadata": "Vidéo générée par intelligence artificielle. Contenu de divertissement — aucun pari, aucune mise, aucun gain."
+  },
+  "voice": {
+    "provider": "elevenlabs",
+    "elevenlabs_voice_id": "onwK4e9ZLuTAKqWW03F9",
+    "elevenlabs_model": "eleven_multilingual_v2"
+  }
+}

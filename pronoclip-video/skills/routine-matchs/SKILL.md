@@ -27,7 +27,8 @@ revendable en changeant ce seul fichier).
 - **Si le fichier existe** : le charger et passer directement en Phase 1.
 - **Sinon**, dérouler le mini-flow d'onboarding, puis écrire le fichier :
 
-1. **CMS** — `company_id` (défaut : `321`) ; comptes sociaux cibles via
+1. **CMS** — `company_id` **lu depuis l'environnement**
+   (`RAPIDOCMS_COMPANY_ID`, voir `.env.example`) ; comptes sociaux cibles via
    `list_connected_accounts`, choix validé par l'utilisateur ;
 2. **RH** — projet et colonnes créés/résolus via le skill `suivi-rh-daily`
    (Partie A) → IDs numériques ;
@@ -45,18 +46,18 @@ Schéma canonique du fichier (source de vérité pour TOUS les skills) :
 ```json
 {
   "cms": {
-    "company_id": 321,
+    "company_id": "${RAPIDOCMS_COMPANY_ID}",
     "comptes": [
       { "id": "…", "plateforme": "tiktok", "nom": "…" }
     ]
   },
   "rh": {
-    "projet_id": 29,
+    "projet_id": "<résolu à l'onboarding>",
     "colonnes": {
-      "matchs_a_traiter": 101,
-      "video_en_cours": 102,
-      "publie": 103,
-      "echecs_a_reprendre": 104
+      "matchs_a_traiter": "<id colonne>",
+      "video_en_cours": "<id colonne>",
+      "publie": "<id colonne>",
+      "echecs_a_reprendre": "<id colonne>"
     }
   },
   "competitions": ["Ligue des Champions", "Ligue Europa", "Euro"],

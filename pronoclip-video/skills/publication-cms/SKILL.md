@@ -20,7 +20,7 @@ skill. Clés utilisées ici :
 
 | Clé | Défaut à l'installation | Usage |
 |---|---|---|
-| `cms.company_id` | `321` | identifiant société RapidoCMS |
+| `cms.company_id` | `${RAPIDOCMS_COMPANY_ID}` (env) | identifiant société RapidoCMS |
 | `cms.comptes` | *(découverte onboarding)* | comptes cibles de publication |
 | `fenetre_publication` | H-6 → H-2 | créneau avant coup d'envoi (étape 3) |
 | `langue_captions` | `fr` | langue des captions (étape 2) |

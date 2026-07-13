@@ -4,3 +4,12 @@ pronoclip-logs/
 pronoclip-data/
 .media/
 node_modules/
+reference-site/
+
+# Secrets — jamais versionnés
+.env
+.env.local
+
+# Documents de travail internes — jamais versionnés
+MISSION.md
+PROMPT-pronoclip-video-v1.md

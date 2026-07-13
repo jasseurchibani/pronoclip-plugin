@@ -39,12 +39,12 @@ Deux responsabilités, via le MCP **RapidoRh** :
    ```json
    {
      "rh": {
-       "projet_id": 29,
+       "projet_id": "<résolu à l'onboarding>",
        "colonnes": {
-         "matchs_a_traiter": 101,
-         "video_en_cours": 102,
-         "publie": 103,
-         "echecs_a_reprendre": 104
+         "matchs_a_traiter": "<id colonne>",
+         "video_en_cours": "<id colonne>",
+         "publie": "<id colonne>",
+         "echecs_a_reprendre": "<id colonne>"
        }
      }
    }

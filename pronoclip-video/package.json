@@ -1,0 +1,13 @@
+{
+  "name": "pronoclip-video-core",
+  "version": "0.5.0-dev",
+  "private": true,
+  "type": "module",
+  "description": "Cœur logique (core/) et adaptateurs (adapters/) du plugin pronoclip-video. Squelette Phase 1 — aucune logique métier pour l'instant.",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
