@@ -78,8 +78,14 @@ function subjectBlock(bible: MatchBible, shot: Shot): string {
         `Subject: three different strikers, some in a ${home.kit}, some in a ${away.kit}, ` +
         `each completing a finish.`
       )
-    case 'final_result':
+    case 'final_result': {
+      // Kit du vainqueur forcé (cf. fix winner-kit) ; générique seulement en cas de nul.
+      if (shot.teamSide === 'home' || shot.teamSide === 'away') {
+        const kit = bible.teams[shot.teamSide]
+        return `Subject: a single victorious athlete wearing a ${kit.kit}, arms raised in triumph.`
+      }
       return `Subject: a single victorious athlete, arms raised, in bold flat team colours, no crest, no number.`
+    }
     default:
       return `Subject: an athlete in bold flat team colours, no crest, no number.`
   }

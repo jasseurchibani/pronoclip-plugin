@@ -154,7 +154,9 @@ export function allocateShots(input: ShotBudgetInput): Shot[] {
     { order: 0, sceneType: 'rival_reveal', teamSide: 'away', playerName: awayHero, caption: away.name },
     { order: 0, sceneType: 'face_off', teamSide: 'both', playerName: null, caption: `${home.name} vs ${away.name}` },
     ...middle,
-    { order: 0, sceneType: 'final_result', teamSide: 'both', playerName: null, caption: SCENE_CAPTIONS.final_result! },
+    // Le résultat final porte le camp VAINQUEUR → kit du gagnant forcé (jamais le
+    // perdant qui triomphe). Match nul → 'both' (sujet générique).
+    { order: 0, sceneType: 'final_result', teamSide: winnerSide ?? 'both', playerName: null, caption: SCENE_CAPTIONS.final_result! },
   ]
 
   return all.map((shot, i) => ({ ...shot, order: i + 1 }))

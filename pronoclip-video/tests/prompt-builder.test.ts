@@ -74,6 +74,29 @@ describe('framing policy « visage non-ancre » (character_likeness)', () => {
   })
 })
 
+describe('fix winner-kit : le vainqueur porte SON kit, jamais celui du perdant', () => {
+  const winScript = buildMatchScript({ home: HOME, away: AWAY, score: { home: 2, away: 0 }, seed: 3 })
+  const winBible = buildMatchBible({ script: winScript, home: HOME, away: AWAY })
+  const HOME_KIT = 'deep royal blue' // défaut kitFor(home) — fixtures sans colors
+  const AWAY_KIT = 'crimson red' // défaut kitFor(away)
+
+  it('final_result d’un 2-0 domicile → kit domicile, jamais extérieur', () => {
+    const shot = winScript.shots.find(s => s.sceneType === 'final_result')!
+    expect(shot.teamSide).toBe('home')
+    const prompt = buildImagePrompt(winBible, shot)
+    expect(prompt).toContain(HOME_KIT)
+    expect(prompt).not.toContain(AWAY_KIT)
+  })
+
+  it('celebration d’un 2-0 domicile → kit domicile, jamais extérieur', () => {
+    const shot = winScript.shots.find(s => s.sceneType === 'celebration')!
+    expect(shot.teamSide).toBe('home')
+    const prompt = buildImagePrompt(winBible, shot)
+    expect(prompt).toContain(HOME_KIT)
+    expect(prompt).not.toContain(AWAY_KIT)
+  })
+})
+
 describe('final_result : aucun scoreboard dans l’image', () => {
   it('ni le fragment ni le prompt ne mentionnent de scoreboard', () => {
     const finalShot = script.shots.find(s => s.sceneType === 'final_result')!
