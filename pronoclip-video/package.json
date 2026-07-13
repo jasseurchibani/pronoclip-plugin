@@ -8,10 +8,13 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "example": "tsx scripts/generate-example.ts",
-    "prompts": "tsx scripts/generate-prompts.ts"
+    "prompts": "tsx scripts/generate-prompts.ts",
+    "render": "tsx scripts/render-video.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
+    "ffmpeg-static": "^5.2.0",
+    "puppeteer-core": "^23.0.0",
     "tsx": "^4.16.0",
     "typescript": "^5.5.0",
     "vitest": "^2.0.0"

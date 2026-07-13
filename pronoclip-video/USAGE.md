@@ -41,7 +41,22 @@ npm test          # 66 tests (vitest)
 npm run typecheck # tsc --noEmit
 npm run example   # → examples/match-script.real-madrid-vs-barcelone.json (L0)
 npm run prompts   # → examples/prompts.real-madrid-vs-barcelone.txt (8 prompts)
+npm run render    # → pronoclip-output/*.mp4 (montage 40 s, overlays, mention IA)
 ```
+
+### Rendu vidéo (Phase 5)
+
+- **Cible de prod** : **CLI HyperFrames** (HTML→MP4, local, gratuit ; exige `bun`).
+- **`npm run render`** : rend la MÊME page de composition (`core/composition.ts`) en
+  local via **Chrome headless + ffmpeg-static** — local, gratuit, **jamais** le MCP
+  payant `render_video`. Fallback utilisé ici car `bun`/HyperFrames ne sont pas installés.
+- **Hook bloquant** : `core/render-guard.ts` refuse le rendu si la mention IA (filigrane
+  + carton de fin) est vide (`assertDisclosure`). La mention n'est jamais supprimable.
+- Overlays (tous en HTML, aucun texte dans les images) : caption, buteur + type de but,
+  **score incrémental** à chaque but, scoreboard final, **filigrane IA persistant**,
+  **carton de fin**. Charte : fond `#0A0A0A`, accent `#33D17A` en accent seulement.
+- Métadonnées MP4 : mention IA + (en B3) « preview technique — cohérence de personnage
+  non garantie ».
 
 - **`/pronoclip-squad <équipe>`** : sème la bibliothèque de portraits (gaté, sert le
   mode B1 ; inutile en B3 mais l'architecture reste).
