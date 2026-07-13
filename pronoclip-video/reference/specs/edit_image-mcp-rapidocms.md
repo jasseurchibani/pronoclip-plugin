@@ -50,6 +50,12 @@ Deux manques pour notre usage :
 visage peut être généré en portrait via `edit_image` lui-même sans référence, ou via
 un `generate_image` étendu).
 
+> **Constat empirique (test du 2026-07-13)** : `generate_image(prompt, size:"hd")`
+> a renvoyé une image **1024×1536 portrait** (modèle sous-jacent `gpt-image-1.5`).
+> C'est le bon format — **mais** `size` étant une *qualité* (`hd`/`standard`) et non
+> des dimensions, ce comportement n'est **ni documenté ni garanti ni contrôlable**.
+> `edit_image` doit donc rendre `size` explicite (`"1024x1536"`) pour le garantir.
+
 ---
 
 ## 3. Signature de `edit_image`
