@@ -47,6 +47,14 @@ export type InputLevel = 'L0' | 'L1' | 'L2' | 'L3'
 /** Niveau de rendu (cf. MISSION §8) : `motion` (gratuit) ou `animated` (premium). */
 export type RenderLevel = 'motion' | 'animated'
 
+/**
+ * Politique de ressemblance (cf. décision A2, Option 5) :
+ * - `independent` : athlète fictif indépendant + cadrage « visage non-ancre »
+ *   (contre-jour, plan large, visage dans l'ombre) → identité par kit/silhouette ;
+ * - `inspired` : visage visible (réservé, sous validation juridique).
+ */
+export type CharacterLikeness = 'independent' | 'inspired'
+
 /** Poste du joueur — pilote les probabilités de type de but par défaut. */
 export type Position = 'GK' | 'DF' | 'MF' | 'WG' | 'FW'
 
@@ -228,6 +236,39 @@ export interface MatchBible {
   teams: { home: TeamKitBible; away: TeamKitBible }
   players: Record<string, PlayerBible>
   seed: number
+}
+
+// ---------------------------------------------------------------------------
+// Bibliothèque de portraits canonique et partagée (cf. ADR 2026-07-13).
+// ---------------------------------------------------------------------------
+
+/** Description physique fictive d'un joueur, gelée dans la bibliothèque. */
+export interface PlayerDescriptor {
+  build: string
+  hair: string
+  skin: string
+  boots: string
+  number: number
+}
+
+/** Un portrait de référence curé et gelé (asset de marque, pas cache jetable). */
+export interface PortraitAsset {
+  portrait_url: string
+  descriptor: PlayerDescriptor
+  seed: number
+  version: number
+  status: 'frozen' | 'draft'
+}
+
+/**
+ * Index d'effectif semé, pour un namespace + une équipe.
+ * `namespace` : `pronoclip` (canonique) ou `<marque>` (revendeur).
+ */
+export interface SquadIndex {
+  namespace: string
+  team: string
+  team_code: string
+  players: Record<string, PortraitAsset>
 }
 
 /** L'artefact relisible/corrigible avant toute génération (cf. MISSION §6). */

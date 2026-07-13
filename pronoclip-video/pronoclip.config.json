@@ -2,10 +2,20 @@
   "_comment": "Config produit de pronoclip-video — versionnable, sans secret ni identifiant client. Les identifiants (RAPIDOCMS_COMPANY_ID, URLs MCP) et les clés API vivent dans .env (voir .env.example). Les données client de runtime (comptes sociaux, IDs RapidoRH) vivent dans ./pronoclip-data/config.json (jamais versionné). Un revendeur ne modifie que ce fichier + son .env, jamais le code.",
   "brand": {
     "name": "PronoClip",
+    "namespace": "pronoclip",
     "colors": {
       "background": "#0A0A0A",
       "accent": "#33D17A"
     }
+  },
+  "characters": {
+    "_comment": "likeness=independent : athlète fictif indépendant + cadrage « visage non-ancre » (contre-jour, plan large, visage dans l'ombre) → identité par kit/silhouette/posture, noms en overlay. likeness=inspired : visage visible (réservé, à valider juridiquement). Cf. reference/decisions/2026-07-13-nom-reel-visage-fictif.md (Option 5).",
+    "likeness": "independent"
+  },
+  "portraits": {
+    "_comment": "Bibliothèque de portraits canonique et partagée. Résolution : brand.namespace d'abord, puis canonical_namespace. Les portraits canoniques sont lus en HTTPS depuis canonical_manifest_base_url (aucun compte RapidoCMS requis pour lire). Cf. reference/decisions/2026-07-13-bibliotheque-portraits-canonique.md.",
+    "canonical_namespace": "pronoclip",
+    "canonical_manifest_base_url": "https://cdn.pronoclip.app/portraits"
   },
   "video": {
     "duration_seconds": 40,

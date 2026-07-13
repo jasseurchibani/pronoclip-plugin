@@ -61,6 +61,19 @@ describe('l’aura injectée vient de l’équipe, pas du fragment', () => {
   })
 })
 
+describe('framing policy « visage non-ancre » (character_likeness)', () => {
+  it('independent (défaut) → directive contre-jour / visage dans l’ombre dans les 8 plans', () => {
+    const ps = buildAllPrompts(bible, script.shots, { characterLikeness: 'independent' })
+    for (const p of ps) expect(p.prompt, `plan ${p.order}`).toMatch(/contre-jour|falls into shadow/i)
+    // défaut = independent
+    expect(buildImagePrompt(bible, script.shots[0])).toMatch(/falls into shadow/i)
+  })
+  it('inspired → aucune directive de désancrage du visage', () => {
+    const ps = buildAllPrompts(bible, script.shots, { characterLikeness: 'inspired' })
+    for (const p of ps) expect(p.prompt, `plan ${p.order}`).not.toMatch(/falls into shadow|kept in shadow/i)
+  })
+})
+
 describe('final_result : aucun scoreboard dans l’image', () => {
   it('ni le fragment ni le prompt ne mentionnent de scoreboard', () => {
     const finalShot = script.shots.find(s => s.sceneType === 'final_result')!

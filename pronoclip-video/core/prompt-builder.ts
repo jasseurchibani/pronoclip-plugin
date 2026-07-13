@@ -4,9 +4,21 @@
 // L'aura vient de teams[side].aura, jamais du fragment. Aucun texte/chiffre/nom
 // n'est demandé dans l'image. Pur : aucune I/O.
 
-import type { MatchBible, SceneType, Shot } from './types'
+import type { CharacterLikeness, MatchBible, SceneType, Shot } from './types'
 import { STYLE_BLOCK, NEGATIVE_BLOCK } from './scene-style'
 import { SCENE_FRAGMENTS } from './scene-fragments'
+
+export interface PromptOptions {
+  /** Défaut `independent` : cadrage « visage non-ancre » (cf. décision A2, Option 5). */
+  characterLikeness?: CharacterLikeness
+}
+
+// Directive « visage non-ancre » (appliquée à TOUS les plans quand likeness=independent).
+// Aucun headshot net nulle part : le visage tombe dans l'ombre, l'identité passe par le
+// kit, le gabarit, la silhouette et la posture. Le nom/numéro arrivent en overlay HTML.
+const FACE_NOT_ANCHOR =
+  'strong backlight (contre-jour), the face falls into shadow and is never the focal ' +
+  'point — identity reads from kit colour, build, silhouette and stance, never a clean readable face'
 
 /** Réglage caméra applicable à un type de plan. */
 function cameraFor(bible: MatchBible, sceneType: SceneType): string {
@@ -74,12 +86,24 @@ function subjectBlock(bible: MatchBible, shot: Shot): string {
 }
 
 /** Assemble le prompt final d'un plan. */
-export function buildImagePrompt(bible: MatchBible, shot: Shot): string {
+export function buildImagePrompt(bible: MatchBible, shot: Shot, opts: PromptOptions = {}): string {
+  const likeness: CharacterLikeness = opts.characterLikeness ?? 'independent'
+  const faceNotAnchor = likeness === 'independent'
+
+  const cameraLine = faceNotAnchor
+    ? `Camera: ${bible.camera.format}, ${cameraFor(bible, shot.sceneType)}; ${FACE_NOT_ANCHOR}.`
+    : `Camera: ${bible.camera.format}, ${cameraFor(bible, shot.sceneType)}.`
+
+  const subject = subjectBlock(bible, shot)
+  const subjectLine = faceNotAnchor
+    ? `${subject} The face is kept in shadow — not the focal point.`
+    : subject
+
   return [
     STYLE_BLOCK,
     worldBlock(bible),
-    `Camera: ${bible.camera.format}, ${cameraFor(bible, shot.sceneType)}.`,
-    subjectBlock(bible, shot),
+    cameraLine,
+    subjectLine,
     `Action: ${SCENE_FRAGMENTS[shot.sceneType]}`,
     `Negative: ${NEGATIVE_BLOCK}.`,
   ].join('\n\n')
@@ -93,11 +117,11 @@ export interface BuiltPrompt {
 }
 
 /** Construit les prompts des 8 plans. */
-export function buildAllPrompts(bible: MatchBible, shots: Shot[]): BuiltPrompt[] {
+export function buildAllPrompts(bible: MatchBible, shots: Shot[], opts: PromptOptions = {}): BuiltPrompt[] {
   return shots.map(shot => ({
     order: shot.order,
     sceneType: shot.sceneType,
     playerName: shot.playerName,
-    prompt: buildImagePrompt(bible, shot),
+    prompt: buildImagePrompt(bible, shot, opts),
   }))
 }

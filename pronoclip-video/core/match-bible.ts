@@ -7,7 +7,7 @@
 // Pur : aucune I/O.
 
 import type {
-  MatchBible, MatchScript, PlayerBible, Team, TeamSide, WorldBible,
+  MatchBible, MatchScript, PlayerBible, PortraitAsset, Team, TeamSide, WorldBible,
   WorldPresetKey, WorldSelection,
 } from './types'
 import { makeRng, seedFromString } from './rng'
@@ -22,6 +22,13 @@ export interface MatchBibleInput {
    * explicite par match. Voir aussi `worldSelectionFromConfig`.
    */
   world?: WorldSelection
+  /**
+   * Résolveur de portraits semés (cf. ADR bibliothèque). SI FOURNI (chemin vidéo,
+   * Phase 4b) : les fiches viennent de la bibliothèque gelée et une absence lève
+   * « non semé ». SI ABSENT (aperçu de prompts / tests) : fiches inventées,
+   * `reference_image_url` = null, AUCUNE image n'est jamais générée.
+   */
+  portraitFor?: (playerName: string, side: TeamSide) => PortraitAsset
 }
 
 // Presets de monde cohérents (chaque bloc se tient : heure ⇄ ciel ⇄ éclairage ⇄ grade).
@@ -125,16 +132,31 @@ export function buildMatchBible(input: MatchBibleInput): MatchBible {
 
   const players: Record<string, PlayerBible> = {}
   for (const name of names) {
-    // rng propre à chaque joueur → fiche stable quel que soit l'ordre d'itération.
-    const pr = makeRng(seed ^ seedFromString(name))
-    players[name] = {
-      side: sideOf(name),
-      build: pick(pr, BUILDS),
-      hair: pick(pr, HAIR),
-      skin: pick(pr, SKIN),
-      number: 1 + (Math.floor(pr() * 29) % 29),
-      boots: pick(pr, BOOTS),
-      reference_image_url: null, // rempli en Phase 4 (visage héros figé, Décision B1).
+    const side = sideOf(name)
+    if (input.portraitFor) {
+      // Chemin vidéo : fiche LUE dans la bibliothèque semée (lève « non semé » si absent).
+      const asset = input.portraitFor(name, side)
+      players[name] = {
+        side,
+        build: asset.descriptor.build,
+        hair: asset.descriptor.hair,
+        skin: asset.descriptor.skin,
+        number: asset.descriptor.number,
+        boots: asset.descriptor.boots,
+        reference_image_url: asset.portrait_url,
+      }
+    } else {
+      // Aperçu : fiche inventée, stable par graine, sans image de référence.
+      const pr = makeRng(seed ^ seedFromString(name))
+      players[name] = {
+        side,
+        build: pick(pr, BUILDS),
+        hair: pick(pr, HAIR),
+        skin: pick(pr, SKIN),
+        number: 1 + (Math.floor(pr() * 29) % 29),
+        boots: pick(pr, BOOTS),
+        reference_image_url: null,
+      }
     }
   }
 

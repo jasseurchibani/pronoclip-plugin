@@ -8,14 +8,19 @@ import { fileURLToPath } from 'node:url'
 import { buildMatchScript } from '../core/match-script'
 import { buildMatchBible, worldSelectionFromConfig, type WorldConfig } from '../core/match-bible'
 import { buildAllPrompts } from '../core/prompt-builder'
+import type { CharacterLikeness } from '../core/types'
 import { realMadrid, barcelone, EXAMPLE_SEED } from './example-teams'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
-// Câblage config → Match Bible : le monde est un défaut de marque VERROUILLÉ,
-// lu depuis pronoclip.config.json. Changer le preset ici change les 60 épisodes.
-const config = JSON.parse(readFileSync(resolve(here, '../pronoclip.config.json'), 'utf8')) as { world?: WorldConfig }
+// Câblage config → Match Bible / prompts : monde verrouillé de marque + politique de
+// ressemblance, lus depuis pronoclip.config.json.
+const config = JSON.parse(readFileSync(resolve(here, '../pronoclip.config.json'), 'utf8')) as {
+  world?: WorldConfig
+  characters?: { likeness?: CharacterLikeness }
+}
 const world = worldSelectionFromConfig(config.world)
+const characterLikeness: CharacterLikeness = config.characters?.likeness ?? 'independent'
 
 const script = buildMatchScript({
   home: realMadrid,
@@ -24,7 +29,7 @@ const script = buildMatchScript({
   seed: EXAMPLE_SEED,
 })
 const bible = buildMatchBible({ script, home: realMadrid, away: barcelone, world })
-const prompts = buildAllPrompts(bible, script.shots)
+const prompts = buildAllPrompts(bible, script.shots, { characterLikeness })
 
 const lines: string[] = []
 lines.push(`# 8 prompts d'image — ${script.match.home} ${script.prediction.score.home}-${script.prediction.score.away} ${script.match.away}`)

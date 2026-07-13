@@ -20,3 +20,21 @@ export interface McpPublishAdapter extends PublishPort {
   // TODO(Phase 6): publication RapidoCMS.
   readonly _placeholder?: never
 }
+
+// Bibliothèque de portraits (cf. ADR 2026-07-13). Le SEMIS écrit (génère + gèle) ;
+// la LECTURE charge les index (fichier local + manifeste canonique HTTP public).
+// Le core reste pur (core/portrait-index.ts) : il ne fait que résoudre.
+
+export interface SquadSeeder {
+  // TODO(Phase 4a): /pronoclip-squad — génère les portraits manquants (edit_image),
+  // fait valider par un humain, gèle dans l'index ./pronoclip-data/squads/<ns>/<équipe>.json.
+  // PAYANT : coût affiché + accord explicite avant toute génération.
+  readonly _placeholder?: never
+}
+
+export interface SquadIndexLoader {
+  // TODO(Phase 4b): charge les SquadIndex (local `<marque>/` + manifeste canonique
+  // `pronoclip/` en HTTPS public) pour alimenter makePortraitResolver (lecture seule,
+  // aucun compte RapidoCMS requis pour lire le canonique).
+  readonly _placeholder?: never
+}
