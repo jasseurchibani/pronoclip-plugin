@@ -52,6 +52,44 @@ export function makeImageGenerator(opts: ImageGeneratorOptions) {
 }
 
 // ---------------------------------------------------------------------------
+// Image→vidéo — tier `animated` (premium, cf. MISSION §8)
+// ---------------------------------------------------------------------------
+
+export interface ClipRequest {
+  /** URL/chemin de l'image fixe utilisée comme PREMIÈRE frame. */
+  firstFrame: string
+  videoPrompt: string
+  negativePrompt: string
+  durationSeconds: number
+}
+
+export interface ClipResult {
+  video_url: string
+}
+
+/** Transport réel injecté : API d'un modèle image→vidéo (Kling / Runway / …). */
+export type ClipInvoke = (req: ClipRequest) => Promise<ClipResult>
+
+/**
+ * Génère un clip image→vidéo. PREMIUM : n'existe qu'en tier `animated`, jamais par
+ * défaut, jamais en routine auto. Le transport est injecté ; s'il est absent, on
+ * refuse explicitement (aucun modèle configuré) plutôt que de dégrader en silence.
+ */
+export function makeClipGenerator(opts: { invoke?: ClipInvoke; warn?: (m: string) => void }) {
+  const warn = opts.warn ?? ((m: string) => console.warn(m))
+  return async function generateClip(req: ClipRequest): Promise<ClipResult> {
+    if (!opts.invoke) {
+      throw new Error(
+        'Tier animated : aucun modèle image→vidéo configuré (clé Kling/Runway/… absente). ' +
+        'Fournir un transport ClipInvoke, ou rester en tier motion.',
+      )
+    }
+    warn(`Tier ANIMATED (premium) — clip payant : ${req.durationSeconds}s`)
+    return opts.invoke(req)
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Voix off + publication (Phases 4/6) — stubs typés, aucune I/O ici.
 // ---------------------------------------------------------------------------
 

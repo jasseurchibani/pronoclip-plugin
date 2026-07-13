@@ -9,7 +9,8 @@
     "test": "vitest run",
     "example": "tsx scripts/generate-example.ts",
     "prompts": "tsx scripts/generate-prompts.ts",
-    "render": "tsx scripts/render-video.ts"
+    "render": "tsx scripts/render-video.ts",
+    "animate": "tsx scripts/animate-shot.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

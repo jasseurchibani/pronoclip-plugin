@@ -30,8 +30,15 @@
     "preset": "night"
   },
   "render": {
+    "_comment": "level=motion (DÉFAUT, gratuit) : images animées HTML (Ken Burns). level=animated (PREMIUM, payant) : chaque plan passé dans un modèle image→vidéo. animated ne s'active QUE par opt-in explicite (ex. --animated), jamais par défaut ni en routine auto (§8).",
     "level": "motion",
-    "_levels": ["motion", "animated"]
+    "_levels": ["motion", "animated"],
+    "animated": {
+      "model": "kling-2.1-i2v",
+      "provider": "fal | replicate | kling-api",
+      "duration_seconds": 5,
+      "cost_per_clip_usd_estimate": 0.30
+    }
   },
   "image": {
     "_comment": "Mode de génération d'images. B1 = edit_image avec portraits de référence (cohérence de visage garantie). B3 = generate_image SANS référence — STOPGAP TEMPORAIRE, cohérence de visage NON garantie, dégradation bruyante (avertissement par plan + note métadonnées). Bascule B3→B1 SANS réécriture du cœur dès qu'edit_image est livré. Cf. reference/specs/edit_image-mcp-rapidocms.md.",

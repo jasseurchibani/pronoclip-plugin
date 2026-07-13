@@ -8,6 +8,18 @@ export interface DisclosureConfig {
   image?: { mode?: string; b3_metadata_note?: string }
 }
 
+export type RenderLevel = 'motion' | 'animated'
+
+/**
+ * Résout le tier de rendu. `motion` reste le DÉFAUT ; `animated` (premium, payant)
+ * n'est activé que par opt-in EXPLICITE (flag `--animated`) — jamais par défaut,
+ * jamais dans une routine automatisée (cf. MISSION §8).
+ */
+export function resolveRenderLevel(configLevel: string | undefined, explicitAnimated?: boolean): RenderLevel {
+  if (explicitAnimated) return 'animated'
+  return configLevel === 'animated' ? 'animated' : 'motion'
+}
+
 export class MissingDisclosureError extends Error {
   constructor(message: string) {
     super(message)
