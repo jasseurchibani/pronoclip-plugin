@@ -1,0 +1,267 @@
+# 8 prompts d'image — Real Madrid 2-0 FC Barcelone
+# Match Bible verrouillé — monde : golden-hour dusk | grade : warm amber midtones, long shadows, teal shadow tones | seed : 1550747408
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 1/8 — team_reveal — Mbappé
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
+
+Subject: a broad-shouldered and athletic athlete with short blond hair, light skin, wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number, matching white shorts, matching white socks, and crimson boots; a warm white-gold energy aura wraps the athlete.
+
+Action: A lone athlete plants into a full-body hero stance, chin slowly rising, fists clenching, muscles taut and shoulders squared; a slow push-in on a low three-quarter angle.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 2/8 — rival_reveal — Lewandowski
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
+
+Subject: a compact and muscular athlete with curly black hair, dark skin, wearing a solid deep blue jersey with garnet trim, flat colour, no crest, no sponsor, no number, matching deep blue shorts, matching deep blue socks, and white boots; a cold electric-blue energy aura wraps the athlete.
+
+Action: A lone athlete turns to face the lens in a full-body hero stance, shoulders squared, a cold hard stare, weight shifting forward; a slow push-in on a low three-quarter angle.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 3/8 — face_off
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 50mm eye-level framing.
+
+Subject: two rival athletes face to face — one wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number with a warm white-gold energy aura, the other a solid deep blue jersey with garnet trim, flat colour, no crest, no sponsor, no number with a cold electric-blue energy aura; the two auras clash between them.
+
+Action: Two rival athletes stand nose to nose in profile, foreheads almost touching, jaws clenched, crackling tension arcing between them; a slow whip-pan snaps from one profile and settles between the two faces.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 4/8 — goal_normal — Mbappé
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
+
+Subject: a broad-shouldered and athletic athlete with short blond hair, light skin, wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number, matching white shorts, matching white socks, and crimson boots; a warm white-gold energy aura wraps the athlete.
+
+Action: The striker drives a low first-time finish, planting and sweeping through the ball; it rifles past the diving keeper and rips into the side netting, the net snapping violently taut; a dynamic follow of the ball into the goal.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 5/8 — goal_normal — Vinícius Jr
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
+
+Subject: a broad-shouldered and athletic athlete with a shaved head, tan skin, wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number, matching white shorts, matching white socks, and crimson boots; a warm white-gold energy aura wraps the athlete.
+
+Action: The striker drives a low first-time finish, planting and sweeping through the ball; it rifles past the diving keeper and rips into the side netting, the net snapping violently taut; a dynamic follow of the ball into the goal.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 6/8 — goalkeeper_save
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
+
+Subject: a goalkeeper wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number diving full-stretch to deny an attacker wearing a solid deep blue jersey with garnet trim, flat colour, no crest, no sponsor, no number.
+
+Action: The goalkeeper explodes full-stretch through the air, body parallel to the ground, both arms thrown out, fingertips punching the ball clear as it screams toward frame; frozen at the instant of contact with slight motion blur on the hands.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 7/8 — celebration — Mbappé
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
+
+Subject: a broad-shouldered and athletic athlete with short blond hair, light skin, wearing a solid white jersey with gold trim, flat colour, no crest, no sponsor, no number, matching white shorts, matching white socks, and crimson boots; a warm white-gold energy aura wraps the athlete.
+
+Action: The athlete wheels away in a full sprint, arms flung wide, head thrown back mid-roar, teammates rushing into frame behind; the camera tracks the run then whips to a low hero angle.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+
+══════════════════════════════════════════════════════════════════════════════
+PLAN 8/8 — final_result
+══════════════════════════════════════════════════════════════════════════════
+A premium 2D digital sports illustration in a sharp,
+semi-realistic anime style, matching the exact dark, intense match-scene aesthetic
+of Blue Lock and Vinland Saga. Strict 2D hand-drawn digital painting with fine ink
+linework. Completely flat 2D graphic novel art style. No 3D rendering, no CGI
+elements, no glossy plastic shading, no chibi features. Fully realistic human
+proportions; sharp, narrow, intensely focused eyes of realistic human size. Highly
+defined facial anatomy, sharp jawlines, broad athletic shoulders, realistic hand
+anatomy with visible knuckles. High-end 2D animated film skin shading with a smooth
+5-tone gradient (bright specular highlight, light midtone, base skin, warm shadow,
+deep shadow). Plain solid-colour jerseys with smooth light-to-shadow gradients,
+fabric folds as curved ink lines, absolutely no crest, no badge, no sponsor, no
+lettering and no number on the kit. High-contrast dramatic lighting: key light from
+above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on the
+opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
+format, ultra-fine ink outline weight.
+
+World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+
+Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
+
+Subject: a single victorious athlete, arms raised, in bold flat team colours, no crest, no number.
+
+Action: The victorious athlete stands tall at center frame, arms spread wide and raised, chest heaving, eyes closed in a long exhale of triumph; a slow majestic pull-back with a slight crane up.
+
+Negative: photorealistic, 3D render, CGI, glossy plastic
+shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
+fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness.
+

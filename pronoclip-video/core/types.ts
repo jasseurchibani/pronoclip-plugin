@@ -75,11 +75,18 @@ export interface Player {
   profile?: PlayerProfile
 }
 
+/** Couleurs d'équipe (aplat, sans écusson ni sponsor — cf. directives légales). */
+export interface TeamColors {
+  primary: string
+  secondary?: string
+}
+
 /** Une équipe + son effectif fourni. `strength` (0..1) est optionnel : biais de score. */
 export interface Team {
   name: string
   players: Player[]
   strength?: number
+  colors?: TeamColors
 }
 
 export interface Score {
@@ -154,10 +161,59 @@ export interface Shot {
   mergedScorers?: { playerName: string; goalType: GoalType }[]
 }
 
+/**
+ * Le « monde » — choisi UNE SEULE FOIS et identique mot pour mot dans les 8 prompts
+ * (cf. MISSION §4). C'est ce verrou qui tue le bug nuit→orage→coucher de soleil.
+ */
+export interface WorldBible {
+  time_of_day: string
+  sky: string
+  weather: string
+  stadium: string
+  floodlights: string
+  crowd: string
+  grade: string
+}
+
+/** Réglages caméra par type de plan (cf. MISSION §4). */
+export interface CameraBible {
+  format: string
+  reveals: string
+  duels: string
+  closeups: string
+  goals: string
+}
+
+/** Identité visuelle d'une équipe. L'aura vient TOUJOURS d'ici, jamais du fragment. */
+export interface TeamKitBible {
+  kit: string
+  shorts: string
+  socks: string
+  aura: string
+}
+
+/**
+ * Fiche personnage verrouillée d'un joueur (athlète fictif — Décision A2).
+ * Reprise mot pour mot dans chaque plan où il apparaît. `number` est stocké pour
+ * les overlays/métadonnées mais N'EST PAS peint dans l'image (no numbers).
+ */
+export interface PlayerBible {
+  side: TeamSide
+  build: string
+  hair: string
+  skin: string
+  number: number
+  boots: string
+  reference_image_url: string | null
+}
+
 /** « Match Bible » : le monde verrouillé une fois, lu par les 8 plans (cf. MISSION §4). */
 export interface MatchBible {
-  // TODO(Phase 3): world, camera, teams, players, seed.
-  readonly _placeholder?: never
+  world: WorldBible
+  camera: CameraBible
+  teams: { home: TeamKitBible; away: TeamKitBible }
+  players: Record<string, PlayerBible>
+  seed: number
 }
 
 /** L'artefact relisible/corrigible avant toute génération (cf. MISSION §6). */
