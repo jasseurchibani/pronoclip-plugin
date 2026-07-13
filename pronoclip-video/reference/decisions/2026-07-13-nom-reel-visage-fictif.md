@@ -55,6 +55,27 @@ représentation est fictive (en plus de la mention IA).
 - **+** Compromis : garde l'information, assume la fiction.
 - **?** La mention suffit-elle juridiquement ? À valider par le juriste.
 
+### Option 5 — Identification par kit + silhouette + posture, VISAGE DÉSANCRÉ *(piste privilégiée)*
+Athlète fictif indépendant (comme Option 1), **mais le visage n'est jamais le point
+d'ancrage** : plan large, contre-plongée héroïque, **contre-jour** (visage dans
+l'ombre). L'identité se lit via **couleurs du maillot, gabarit, posture, pied fort,
+geste signature** ; le **numéro et le nom** arrivent en **overlay HTML** (jamais dans
+l'image). Style anime assumé (Blue Lock) : personne ne lit un clip anime comme une
+photo.
+- **+** Préserve A2 **et** les noms réels en caption (le produit). Le visage obscurci
+  **renforce** A2 (encore moins identifiable que l'Option 1).
+- **+** Supprime la dissonance nom↔visage : aucun visage contradictoire n'est affiché.
+- **−** Contrainte : la règle « visage non-ancre » doit s'appliquer aux **8 plans** →
+  revoir la convention caméra (les `closeups` determination / big_chance_missed
+  passent en contre-jour / 3-4, plus aucun headshot net).
+- **Preuve** : test du 2026-07-13, `pronoclip-output/test_plan1_v2_silhouette.jpg`
+  (reveal attaquant de vitesse, kit blanc, visage dans l'ombre) — comparé à la v1
+  `test_plan1_team_reveal.jpg` (visage net, dissonant). La dissonance venait du
+  **visage net**, pas du cadrage portrait.
+- **Statut** : piste retenue par l'utilisateur (noms conservés). **Reste soumise à
+  validation juridique** — un visage fictif obscurci + nom réel en overlay reste à
+  faire valider.
+
 ## Ce que fait l'implémentation actuelle
 
 **Option 1** par défaut (le plus sûr) : `core/match-bible.ts` génère une fiche
