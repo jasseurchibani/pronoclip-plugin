@@ -120,6 +120,17 @@ Deux surfaces de configuration, à ne pas confondre :
 | `.env` (voir `.env.example`) | **non** | identifiants et secrets : `RAPIDOCMS_COMPANY_ID`, URLs MCP, clés API. |
 | `./pronoclip-data/config.json` | **non** | données **client** de runtime : comptes sociaux, IDs projet/colonnes RapidoRH (résolus à l'onboarding). |
 
+### Mode image B3 — stopgap temporaire
+
+La génération d'images tourne actuellement en **mode B3** (`image.mode` dans
+`pronoclip.config.json`) : `generate_image` **sans image de référence**. C'est un
+**stopgap temporaire**, **pas** le comportement nominal — la cohérence de visage
+n'est **pas** garantie. La dégradation est **bruyante** : avertissement par plan +
+note métadonnées `preview technique — cohérence de personnage non garantie`. Le mode
+nominal est **B1** (`edit_image` + portraits de référence) ; bascule sans réécriture du
+cœur dès que l'outil serveur est livré (`reference/specs/edit_image-mcp-rapidocms.md`).
+Détails dans `USAGE.md`.
+
 ### Anti-régression : ne laisser fuir aucune donnée client
 
 Un ID d'établissement, un ID projet/colonne ou une URL de tenant codés en dur

@@ -33,6 +33,13 @@
     "level": "motion",
     "_levels": ["motion", "animated"]
   },
+  "image": {
+    "_comment": "Mode de génération d'images. B1 = edit_image avec portraits de référence (cohérence de visage garantie). B3 = generate_image SANS référence — STOPGAP TEMPORAIRE, cohérence de visage NON garantie, dégradation bruyante (avertissement par plan + note métadonnées). Bascule B3→B1 SANS réécriture du cœur dès qu'edit_image est livré. Cf. reference/specs/edit_image-mcp-rapidocms.md.",
+    "mode": "B3",
+    "_modes": ["B1", "B3"],
+    "size": "hd",
+    "b3_metadata_note": "preview technique — cohérence de personnage non garantie"
+  },
   "ai_disclosure": {
     "watermark": "Vidéo générée par IA",
     "end_card": [
