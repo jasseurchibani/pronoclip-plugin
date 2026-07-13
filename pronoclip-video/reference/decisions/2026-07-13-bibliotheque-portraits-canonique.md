@@ -130,19 +130,81 @@ Exemple : semer 15 joueurs, ~1,5× pour les rejets → **~1,8 $ une seule fois**
 Sur 60 épisodes d'une même équipe : ~1,8 $ (semis) + 60 × ~0,9 $ ≈ **~56 $** d'images,
 contre un modèle « tout régénérer par vidéo » nettement plus cher **et** incohérent.
 
-## 7. Sous-questions ouvertes (à cadrer, non tranchées ici)
+## 7. Namespace, résidence et lecture des portraits — LE MOAT (load-bearing)
+
+**Le code est copiable ; la bibliothèque curée ne l'est pas.** C'est le seul actif qui
+coûte du temps humain et du jugement à reproduire. **C'est elle le moat, pas le plugin.**
+Cette section est donc load-bearing : sans elle, « la bibliothèque est le moat » ne
+tient pas.
+
+### 7.1 Namespace (dès le schéma d'index, maintenant)
+- `pronoclip/<équipe>` → effectifs **canoniques**, propriété du projet.
+- `<marque>/<équipe>` → override d'un **revendeur** qui veut son propre look.
+
+Le **résolveur** cherche `<marque>/<équipe>` **d'abord**, puis retombe sur
+`pronoclip/<équipe>`. Un revendeur **hérite** donc des effectifs canoniques par défaut
+et peut en **semer d'autres** (par équipe, voire par joueur). `brand.namespace` vit
+dans `pronoclip.config.json` (défaut : `pronoclip`).
+
+### 7.2 Où vivent physiquement les portraits `pronoclip/` canoniques ?
+Dans un **store canonique appartenant au projet** — aujourd'hui la bibliothèque
+RapidoCMS/S3 du propriétaire (bucket `rapido-software…`) — exposé en **lecture publique
+via des URLs stables**, idéalement **derrière un CDN** :
+`https://cdn.pronoclip.app/portraits/pronoclip/<équipe>/<joueur>.png`. Le CDN découple
+des chemins S3 internes (les portraits ne cassent pas si le stockage bouge) et cache
+globalement.
+
+Un **manifeste canonique publié** — `…/portraits/pronoclip/squads/<équipe>.json` à une
+URL stable — liste `portrait_url` + descripteurs + version. Le plugin embarque un
+**snapshot** du manifeste, rafraîchi depuis l'URL canonique.
+
+### 7.3 Comment un revendeur lit-il mes portraits canoniques ?
+**Simple HTTPS GET** des URLs publiques (portraits + manifeste). **Aucun compte
+RapidoCMS requis pour LIRE.** (Vérifié empiriquement : les URLs S3 renvoyées par
+`generate_image` sont directement téléchargeables sans authentification.)
+
+Au rendu, l'`edit_image` du revendeur (sur **son** RapidoCMS) reçoit l'**URL publique**
+du portrait canonique comme référence et la fetch en HTTP — **cross-tenant OK** car
+l'URL est publique.
+
+### 7.4 Et si le revendeur n'a AUCUN compte RapidoCMS ?
+- **Consommation : OUI.** Il tourne 100 % sur `pronoclip/` (lecture publique), **zéro
+  infra requise**. La vidéo lit les portraits canoniques et les passe en référence.
+  ⚠️ Sans RapidoCMS, il n'a pas non plus d'`edit_image` à lui → il faut alors, au
+  choix : un **`edit_image` hébergé par le propriétaire** (service partagé), ou le
+  **repli B3** (pas de référence, cohérence dégradée). À arbitrer via le tiering.
+- **Semer son propre `<marque>/` : NON** sans backend d'écriture (son RapidoCMS **ou**
+  un service de semis hébergé par le propriétaire).
+
+### 7.5 Intégrité du moat
+La **lecture publique ne compromet pas le moat** : le moat n'est pas le secret des
+octets, c'est **l'autorité de curation + le contrôle d'écriture + l'ampleur qui
+grandit**. Seul le propriétaire écrit dans `pronoclip/`. Le namespace canonique est
+**lecture seule pour le monde**. Un concurrent peut aspirer des images ; il ne peut pas
+répliquer une bibliothèque curée, indexée, cohérente, intégrée au pipeline et qui
+s'étend.
+
+### 7.6 Tiering qui en découle
+- **Revendeur de base** : consomme `pronoclip/` (lecture publique, sans compte).
+  Fonctionne out-of-the-box.
+- **Revendeur premium** : sème son `<marque>/` (nécessite RapidoCMS ou service de semis
+  hébergé) pour un look propriétaire ; hérite quand même de `pronoclip/` en fallback.
+
+### 7.7 Impact config
+- `brand.namespace` (défaut `pronoclip` ; un revendeur met sa marque).
+- `portraits.canonical_manifest_base_url` (URL du manifeste/CDN canonique).
+- Ordre de résolution : `[brand.namespace, "pronoclip"]`.
+
+## 8. Sous-questions encore ouvertes (non tranchées)
 
 1. **Périmètre du semis** : effectif complet vs sous-ensemble « vedettes + buteurs
    probables » (défaut proposé : le sous-ensemble, extensible à la demande).
-2. **Global vs par-marque** : « un Mbappé pour tous » = bibliothèque **globale**. Un
-   revendeur pourrait vouloir **son propre** look → prévoir un namespace optionnel par
-   marque (global par défaut, override possible).
-3. **Changement de kit** (saison, maillot extérieur) : le portrait gèle un kit →
+2. **Changement de kit** (saison, maillot extérieur) : le portrait gèle un kit →
    versioning / re-semis quand le kit change.
-4. **Workflow de revue** : qui valide, où l'état d'approbation est stocké, comment on
+3. **Workflow de revue** : qui valide, où l'état d'approbation est stocké, comment on
    remplace un portrait raté sans casser les vidéos déjà produites.
 
-## 8. Liens
+## 9. Liens
 `reference/specs/edit_image-mcp-rapidocms.md` (chemin critique),
 `2026-07-13-nom-reel-visage-fictif.md` (Option 5, visage désancré),
 `core/match-bible.ts` (`players[]` → à alimenter depuis l'index), MISSION §9 (revendabilité).
