@@ -140,8 +140,12 @@ const POS_BICYCLE: Record<Position, number> = { GK: 0, DF: 0.05, MF: 0.15, WG: 0
 
 /**
  * Pondération des types de but POUR CE JOUEUR (cf. MISSION correction §6).
- * `goal_normal` reste la base ; les autres sont modulés par le profil :
- * - tête : quasi-nulle pour un ailier, forte pour un buteur de surface / défenseur ;
+ * `goal_normal` reste la base ; les autres sont modulés par le profil.
+ * La tête est **quadratique** en aptitude aérienne (`aerial²`) : elle ne fait pas
+ * qu'incliner le tirage, elle l'ÉCRASE. Un attaquant à heading bas (ailier,
+ * finisseur de vitesse) ne sort quasiment jamais `goal_header` — ex. aerial 0.15
+ * → poids ≈ 0.8 face à 50 pour `goal_normal` (< 1 %). Un pivot aérien (0.85) →
+ * poids ≈ 24.6, franchement présent.
  * - penalty : réservé au tireur désigné (0 sinon) ;
  * - coup franc : proportionnel à `setPieces` (0 pour un non-tireur) ;
  * - frappe lointaine / volée / retourné : modulés par le poste.
@@ -157,7 +161,7 @@ function goalTypeWeightsFor(player?: Player): ReadonlyArray<readonly [GoalType, 
   const penaltyTaker = prof?.isPenaltyTaker ?? false
   return [
     ['goal_normal', 50],
-    ['goal_header', 26 * aerial],
+    ['goal_header', 34 * aerial * aerial],
     ['goal_volley', 10 * volley],
     ['goal_longrange', 16 * longR],
     ['goal_freekick', 16 * setPieces],

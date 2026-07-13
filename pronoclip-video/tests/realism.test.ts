@@ -39,6 +39,17 @@ describe('correction 1 — type de but selon le profil du joueur', () => {
     const targetMan: Team = { name: 'H', players: [{ name: 'Pivot', profile: { position: 'FW', heading: 0.85 } }] }
     expect(homeGoalTypes(targetMan).has('goal_header')).toBe(true)
   })
+  it('la pondération ÉCRASE la tête pour un finisseur à heading bas (< 3 %)', () => {
+    // Finisseur de vitesse type Mbappé/Vinícius : heading bas → tête quasi absente.
+    const speedster: Team = { name: 'S', players: [{ name: 'Vitesse', profile: { position: 'FW', heading: 0.15 } }] }
+    let headers = 0
+    let total = 0
+    for (let seed = 0; seed < 600; seed++) {
+      const p = predictMatch({ home: speedster, away: AWAY, score: { home: 2, away: 0 }, seed })
+      for (const g of p.goals) { total++; if (g.goalType === 'goal_header') headers++ }
+    }
+    expect(headers / total).toBeLessThan(0.03)
+  })
 })
 
 describe('correction 2 — le camp adverse reste présent dans l’acte central', () => {

@@ -14,7 +14,7 @@ import type { Team } from '../core/types'
 const realMadrid: Team = {
   name: 'Real Madrid',
   players: [
-    { name: 'Mbappé', isKeyPlayer: true, profile: { position: 'FW', heading: 0.4, longRange: 0.65, isPenaltyTaker: true } },
+    { name: 'Mbappé', isKeyPlayer: true, profile: { position: 'FW', heading: 0.15, longRange: 0.65, isPenaltyTaker: true } },
     { name: 'Vinícius Jr', isKeyPlayer: true, profile: { position: 'WG', heading: 0.1, longRange: 0.5 } },
     { name: 'Bellingham', profile: { position: 'MF', heading: 0.6, longRange: 0.6 } },
     { name: 'Rodrygo', profile: { position: 'WG', heading: 0.2, longRange: 0.55 } },
