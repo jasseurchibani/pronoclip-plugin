@@ -7,12 +7,13 @@
 import type { MatchScript, PredictionInput } from './types'
 import { predictMatch } from './prediction'
 import { allocateShots } from './shot-budget'
-import { seedFromString } from './rng'
+import { randomSeed } from './rng'
 
 /** Construit le match-script complet à partir d'une entrée de pronostic. */
 export function buildMatchScript(input: PredictionInput): MatchScript {
   const knockout = input.knockout ?? false
-  const seed = input.seed ?? seedFromString(`${input.home.name}|${input.away.name}`)
+  // Graine = paramètre d'entrée ; défaut ALÉATOIRE (jamais dérivée des noms).
+  const seed = input.seed ?? randomSeed()
 
   const prediction = predictMatch({ ...input, seed })
 

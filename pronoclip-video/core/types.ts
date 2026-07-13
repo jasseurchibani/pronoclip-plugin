@@ -47,11 +47,32 @@ export type InputLevel = 'L0' | 'L1' | 'L2' | 'L3'
 /** Niveau de rendu (cf. MISSION §8) : `motion` (gratuit) ou `animated` (premium). */
 export type RenderLevel = 'motion' | 'animated'
 
+/** Poste du joueur — pilote les probabilités de type de but par défaut. */
+export type Position = 'GK' | 'DF' | 'MF' | 'WG' | 'FW'
+
+/**
+ * Profil football d'un joueur (cf. MISSION correction §6bis). Sert à pondérer le
+ * type de but : un ailier ne marque quasiment jamais de la tête, seul le tireur
+ * désigné prend penaltys et coups francs. Toutes les stats sont dans [0,1].
+ */
+export interface PlayerProfile {
+  position: Position
+  /** Aptitude aérienne (têtes). Défaut dérivé du poste. */
+  heading?: number
+  /** Propension aux frappes lointaines. Défaut dérivé du poste. */
+  longRange?: number
+  /** Qualité sur coups francs (le tireur désigné a une valeur haute). Défaut 0. */
+  setPieces?: number
+  /** Tireur de penalty désigné. Seul lui peut marquer un `goal_penalty`. */
+  isPenaltyTaker?: boolean
+}
+
 /** Un joueur de l'effectif fourni. Les buteurs ne sortent QUE d'ici (cf. MISSION §6). */
 export interface Player {
   id?: string
   name: string
   isKeyPlayer?: boolean
+  profile?: PlayerProfile
 }
 
 /** Une équipe + son effectif fourni. `strength` (0..1) est optionnel : biais de score. */

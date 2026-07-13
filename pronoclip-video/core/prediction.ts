@@ -11,13 +11,14 @@ import type {
   GoalType,
   InputLevel,
   MarketConstraints,
+  Position,
   Prediction,
   PredictionInput,
   Player,
   Score,
   TeamSide,
 } from './types'
-import { makeRng, seedFromString, weightedPick } from './rng'
+import { makeRng, randomSeed, weightedPick } from './rng'
 
 // ---------------------------------------------------------------------------
 // Plafonds de réalisme (repris de prediction-validator.ts — MISSION §5/§6)
@@ -131,19 +132,42 @@ function autoScore(
 // Buteurs + types de but
 // ---------------------------------------------------------------------------
 
-/** Pondération réaliste des types de but (cf. MISSION §6). */
-const GOAL_TYPE_WEIGHTS: ReadonlyArray<readonly [GoalType, number]> = [
-  ['goal_normal', 0.5],
-  ['goal_header', 0.15],
-  ['goal_volley', 0.1],
-  ['goal_longrange', 0.1],
-  ['goal_freekick', 0.08],
-  ['goal_penalty', 0.05],
-  ['goal_bicycle', 0.02],
-]
+// Valeurs par défaut par poste (utilisées si le profil ne précise pas la stat).
+const POS_AERIAL: Record<Position, number> = { GK: 0.1, DF: 0.75, MF: 0.4, WG: 0.15, FW: 0.7 }
+const POS_LONGRANGE: Record<Position, number> = { GK: 0, DF: 0.25, MF: 0.6, WG: 0.5, FW: 0.45 }
+const POS_VOLLEY: Record<Position, number> = { GK: 0, DF: 0.2, MF: 0.4, WG: 0.6, FW: 0.8 }
+const POS_BICYCLE: Record<Position, number> = { GK: 0, DF: 0.05, MF: 0.15, WG: 0.35, FW: 0.6 }
 
-function randomGoalType(rng: () => number): GoalType {
-  return weightedPick(rng, GOAL_TYPE_WEIGHTS)
+/**
+ * Pondération des types de but POUR CE JOUEUR (cf. MISSION correction §6).
+ * `goal_normal` reste la base ; les autres sont modulés par le profil :
+ * - tête : quasi-nulle pour un ailier, forte pour un buteur de surface / défenseur ;
+ * - penalty : réservé au tireur désigné (0 sinon) ;
+ * - coup franc : proportionnel à `setPieces` (0 pour un non-tireur) ;
+ * - frappe lointaine / volée / retourné : modulés par le poste.
+ */
+function goalTypeWeightsFor(player?: Player): ReadonlyArray<readonly [GoalType, number]> {
+  const prof = player?.profile
+  const pos = prof?.position
+  const aerial = prof?.heading ?? (pos ? POS_AERIAL[pos] : 0.4)
+  const longR = prof?.longRange ?? (pos ? POS_LONGRANGE[pos] : 0.35)
+  const volley = pos ? POS_VOLLEY[pos] : 0.3
+  const bicycle = pos ? POS_BICYCLE[pos] : 0.15
+  const setPieces = prof?.setPieces ?? 0
+  const penaltyTaker = prof?.isPenaltyTaker ?? false
+  return [
+    ['goal_normal', 50],
+    ['goal_header', 26 * aerial],
+    ['goal_volley', 10 * volley],
+    ['goal_longrange', 16 * longR],
+    ['goal_freekick', 16 * setPieces],
+    ['goal_penalty', penaltyTaker ? 9 : 0],
+    ['goal_bicycle', 5 * bicycle],
+  ]
+}
+
+function goalTypeFor(rng: () => number, player?: Player): GoalType {
+  return weightedPick(rng, goalTypeWeightsFor(player))
 }
 
 /** Séquence chronologique des buts, en commençant par le domicile (2-1 → H, A, H). */
@@ -197,7 +221,8 @@ export function detectInputLevel(input: PredictionInput): InputLevel {
 
 export function predictMatch(input: PredictionInput): Prediction {
   const knockout = input.knockout ?? false
-  const seed = input.seed ?? seedFromString(`${input.home.name}|${input.away.name}`)
+  // Graine = paramètre d'entrée ; défaut ALÉATOIRE (jamais dérivée des noms).
+  const seed = input.seed ?? randomSeed()
   const rng = makeRng(seed)
   const level = detectInputLevel(input)
 
@@ -240,28 +265,50 @@ export function predictMatch(input: PredictionInput): Prediction {
     }))
   }
 
-  // 3. Remplir UNIQUEMENT ce qui manque (jamais par-dessus une valeur fournie).
+  // 3. L'effectif est une ENTRÉE, jamais une connaissance du modèle (cf. MISSION
+  // correction §6). On refuse d'inventer des buteurs : si un but doit être attribué
+  // automatiquement et que le camp concerné n'a pas d'effectif fourni → erreur.
   const homePlayers = keyFirst(input.home.players)
   const awayPlayers = keyFirst(input.away.players)
+  const needsHomeScorer = slots.some(s => s.teamSide === 'home' && !s.playerName)
+  const needsAwayScorer = slots.some(s => s.teamSide === 'away' && !s.playerName)
+  if (needsHomeScorer && homePlayers.length === 0) {
+    throw new Error(
+      `Effectif domicile requis pour prédire les buteurs (${input.home.name}). ` +
+      `Fournis l'effectif via ./pronoclip-data/ ou le paramètre home.players.`,
+    )
+  }
+  if (needsAwayScorer && awayPlayers.length === 0) {
+    throw new Error(
+      `Effectif extérieur requis pour prédire les buteurs (${input.away.name}). ` +
+      `Fournis l'effectif via ./pronoclip-data/ ou le paramètre away.players.`,
+    )
+  }
+
+  // Index nom → joueur (pour retrouver le profil, buteur fourni comme prédit).
+  const byName = new Map<string, Player>()
+  for (const p of [...input.home.players, ...input.away.players]) byName.set(p.name, p)
+
+  // 4. Remplir UNIQUEMENT ce qui manque (jamais par-dessus une valeur fournie).
   let homeGoalOrder = 0
   let awayGoalOrder = 0
 
   const goals: GoalPrediction[] = slots.map(slot => {
     const goalOrder = slot.teamSide === 'home' ? ++homeGoalOrder : ++awayGoalOrder
-    let playerName = slot.playerName
-    let playerId: string | undefined
-    if (!playerName) {
-      const scorer = scorerFor(slot.teamSide === 'home' ? homePlayers : awayPlayers, goalOrder)
-      playerName = scorer.name
-      playerId = scorer.id
+    let scorer: Player
+    if (slot.playerName) {
+      scorer = byName.get(slot.playerName) ?? { name: slot.playerName }
+    } else {
+      scorer = scorerFor(slot.teamSide === 'home' ? homePlayers : awayPlayers, goalOrder)
     }
-    const goalType = slot.goalType ?? randomGoalType(rng)
+    // Type fourni conservé ; sinon pondéré par le profil du buteur.
+    const goalType = slot.goalType ?? goalTypeFor(rng, scorer)
     return {
       matchOrder: slot.matchOrder,
       teamSide: slot.teamSide,
       goalOrder,
-      playerId,
-      playerName,
+      playerId: scorer.id,
+      playerName: scorer.name,
       goalType,
     }
   })

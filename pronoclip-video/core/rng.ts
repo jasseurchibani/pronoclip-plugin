@@ -12,7 +12,20 @@ export function makeRng(seed: number): () => number {
   }
 }
 
-/** Hache une chaîne en entier 32 bits (pour dériver une graine du nom des équipes). */
+/**
+ * Graine aléatoire (défaut quand l'utilisateur n'en fournit pas). C'est le SEUL
+ * point non déterministe : deux vidéos du même match doivent différer par défaut
+ * (cf. MISSION correction §6ter). Les tests et l'exemple passent une graine explicite.
+ */
+export function randomSeed(): number {
+  return (Math.random() * 0x100000000) >>> 0
+}
+
+/**
+ * Hache une chaîne en entier 32 bits. À n'utiliser QUE pour dériver une graine
+ * explicite (tests, exemple reproductible) — jamais comme graine par défaut, sinon
+ * tous les utilisateurs d'un même match obtiennent la vidéo identique.
+ */
 export function seedFromString(input: string): number {
   let h = 2166136261 >>> 0
   for (let i = 0; i < input.length; i++) {

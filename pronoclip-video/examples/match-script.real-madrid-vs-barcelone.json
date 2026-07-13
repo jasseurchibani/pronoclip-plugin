@@ -32,7 +32,7 @@
         "teamSide": "home",
         "goalOrder": 2,
         "playerName": "Vinícius Jr",
-        "goalType": "goal_header"
+        "goalType": "goal_normal"
       }
     ]
   },
@@ -68,25 +68,25 @@
     },
     {
       "order": 5,
-      "sceneType": "goal_header",
+      "sceneType": "goal_normal",
       "teamSide": "home",
       "playerName": "Vinícius Jr",
-      "caption": "But de la tête : Vinícius Jr",
-      "goalType": "goal_header"
+      "caption": "But : Vinícius Jr",
+      "goalType": "goal_normal"
     },
     {
       "order": 6,
+      "sceneType": "goalkeeper_save",
+      "teamSide": "away",
+      "playerName": null,
+      "caption": "ARRÊT DÉCISIF"
+    },
+    {
+      "order": 7,
       "sceneType": "celebration",
       "teamSide": "home",
       "playerName": "Mbappé",
       "caption": "CÉLÉBRATION"
-    },
-    {
-      "order": 7,
-      "sceneType": "power_up",
-      "teamSide": "home",
-      "playerName": "Mbappé",
-      "caption": "MONTÉE EN PUISSANCE"
     },
     {
       "order": 8,

@@ -89,13 +89,22 @@ export function allocateShots(input: ShotBudgetInput): Shot[] {
   } else {
     // 1 ≤ G ≤ 4 : G plans de but (chronologiques) + remplissage par priorité.
     const goalShots = chrono.map(g => goalShot(0, g))
-    const spare = 4 - G
+    let spare = 4 - G
     const cleanSheet = score.home === 0 || score.away === 0
     const closedMatch = score.home + score.away <= 2
-    const gkSaveSide: TeamSide =
-      score.away === 0 ? 'home' : score.home === 0 ? 'away' : score.home <= score.away ? 'away' : 'home'
+    const shutOutSide: TeamSide = score.home === 0 ? 'home' : 'away' // n'a de sens que si cleanSheet
 
-    // Priorité : celebration > power_up > goalkeeper_save > determination.
+    const fillers: Shot[] = []
+
+    // Clean sheet → un arrêt du gardien est OBLIGATOIRE (cf. MISSION correction §5) :
+    // il explique le blanchissage ET fait entrer le camp adverse (qui attaque puis
+    // se fait refuser). On l'attribue au camp resté muet, qui attaque dans ce plan.
+    if (cleanSheet && spare > 0) {
+      fillers.push({ order: 0, sceneType: 'goalkeeper_save', teamSide: shutOutSide, playerName: null, caption: SCENE_CAPTIONS.goalkeeper_save! })
+      spare--
+    }
+
+    // Priorité : celebration > power_up > goalkeeper_save (match fermé) > determination.
     const candidates: Shot[] = []
     if (winnerSide) {
       candidates.push({ order: 0, sceneType: 'celebration', teamSide: winnerSide, playerName: winnerHero, caption: SCENE_CAPTIONS.celebration! })
@@ -103,15 +112,40 @@ export function allocateShots(input: ShotBudgetInput): Shot[] {
     if (overallTop) {
       candidates.push({ order: 0, sceneType: 'power_up', teamSide: overallTop.side, playerName: overallTop.name, caption: SCENE_CAPTIONS.power_up! })
     }
-    if (cleanSheet || closedMatch) {
-      candidates.push({ order: 0, sceneType: 'goalkeeper_save', teamSide: gkSaveSide, playerName: null, caption: SCENE_CAPTIONS.goalkeeper_save! })
+    if (!cleanSheet && closedMatch) {
+      candidates.push({ order: 0, sceneType: 'goalkeeper_save', teamSide: 'away', playerName: null, caption: SCENE_CAPTIONS.goalkeeper_save! })
     }
 
-    const fillers = candidates.slice(0, spare)
-    while (fillers.length < spare) {
+    for (const c of candidates) {
+      if (spare <= 0) break
+      fillers.push(c)
+      spare--
+    }
+    while (spare > 0) {
       fillers.push({ order: 0, sceneType: 'determination', teamSide: 'home', playerName: homeHero, caption: SCENE_CAPTIONS.determination! })
+      spare--
     }
     middle = [...goalShots, ...fillers]
+  }
+
+  // Garde-fou (cf. MISSION correction §5) : au moins un plan parmi 4–7 met en scène
+  // le camp opposé au protagoniste. Sinon, on convertit le dernier plan de
+  // remplissage (non-but) en arrêt du gardien côté adverse.
+  const protagonist: TeamSide = winnerSide ?? 'home'
+  const opposite: TeamSide = protagonist === 'home' ? 'away' : 'home'
+  if (!middle.some(s => s.teamSide === opposite || s.teamSide === 'both')) {
+    for (let i = middle.length - 1; i >= 0; i--) {
+      if (!middle[i].goalType) {
+        middle[i] = {
+          order: 0,
+          sceneType: 'goalkeeper_save',
+          teamSide: opposite,
+          playerName: null,
+          caption: SCENE_CAPTIONS.goalkeeper_save!,
+        }
+        break
+      }
+    }
   }
 
   // --- Assemblage : intro + middle + outro, renumérotés 1..8 ----------------
