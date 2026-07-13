@@ -46,10 +46,17 @@ npm run render    # → pronoclip-output/*.mp4 (montage 40 s, overlays, mention 
 
 ### Rendu vidéo (Phase 5)
 
-- **Cible de prod** : **CLI HyperFrames** (HTML→MP4, local, gratuit ; exige `bun`).
-- **`npm run render`** : rend la MÊME page de composition (`core/composition.ts`) en
-  local via **Chrome headless + ffmpeg-static** — local, gratuit, **jamais** le MCP
-  payant `render_video`. Fallback utilisé ici car `bun`/HyperFrames ne sont pas installés.
+Deux niveaux (cf. `render.level`) :
+
+- **`animated` (recommandé, la vraie animation)** — pipeline **CLI HyperFrames**,
+  local et gratuit : détourage des sujets (`remove-background`) → composition **GSAP**
+  en calques (fond + sujet animés séparément, caméra par plan, speed lines, overlays)
+  → `hyperframes check` → `hyperframes render -q high`. Générateur :
+  `scripts/hyperframes/gen-composition.mjs`. Détails : `reference/specs/hyperframes-pipeline.md`.
+  Prérequis : `bun` + ffmpeg/ffprobe sur le PATH.
+- **`motion` (repli sans bun)** — `npm run render` : `core/composition.ts` (Ken Burns
+  simple) rendu via **Chrome headless + ffmpeg-static**. Local, gratuit, **jamais** le
+  MCP payant `render_video`.
 - **Hook bloquant** : `core/render-guard.ts` refuse le rendu si la mention IA (filigrane
   + carton de fin) est vide (`assertDisclosure`). La mention n'est jamais supprimable.
 - Overlays (tous en HTML, aucun texte dans les images) : caption, buteur + type de but,
