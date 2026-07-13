@@ -175,6 +175,20 @@ export interface WorldBible {
   grade: string
 }
 
+/** Clés des presets de monde livrés (cf. MISSION §4). */
+export type WorldPresetKey = 'night' | 'dusk' | 'overcast'
+
+/**
+ * Comment le monde est choisi pour une vidéo :
+ * - `preset` : verrouillé sur un preset de marque (défaut) → cohérence inter-vidéos ;
+ * - `vary` : variation explicite, tirée par la graine (cohérente DANS la vidéo) ;
+ * - `custom` : monde de marque sur mesure fourni intégralement.
+ */
+export type WorldSelection =
+  | { mode: 'preset'; preset: WorldPresetKey }
+  | { mode: 'vary' }
+  | { mode: 'custom'; world: WorldBible }
+
 /** Réglages caméra par type de plan (cf. MISSION §4). */
 export interface CameraBible {
   format: string

@@ -14,6 +14,11 @@
     "aspect_ratio": "9:16",
     "language": "fr"
   },
+  "world": {
+    "_comment": "Monde de marque VERROUILLÉ : identique pour toute la chaîne (cohérence inter-vidéos). preset ∈ night|dusk|overcast. vary_per_match:true = variation par match (cohérente dans chaque vidéo, mais différente d'un épisode à l'autre). Un monde 100% sur mesure se met dans custom (objet WorldBible complet).",
+    "vary_per_match": false,
+    "preset": "night"
+  },
   "render": {
     "level": "motion",
     "_levels": ["motion", "animated"]

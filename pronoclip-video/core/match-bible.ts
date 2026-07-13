@@ -6,18 +6,28 @@
 // Athlètes fictifs (Décision A2) : fiches personnage inventées mais verrouillées.
 // Pur : aucune I/O.
 
-import type { MatchBible, MatchScript, PlayerBible, Team, TeamSide, WorldBible } from './types'
+import type {
+  MatchBible, MatchScript, PlayerBible, Team, TeamSide, WorldBible,
+  WorldPresetKey, WorldSelection,
+} from './types'
 import { makeRng, seedFromString } from './rng'
 
 export interface MatchBibleInput {
   script: MatchScript
   home: Team
   away: Team
+  /**
+   * Sélection du monde. Défaut : preset de marque VERROUILLÉ → cohérence entre
+   * les 60 épisodes d'une chaîne. Passer `{ mode:'vary' }` pour une variation
+   * explicite par match. Voir aussi `worldSelectionFromConfig`.
+   */
+  world?: WorldSelection
 }
 
 // Presets de monde cohérents (chaque bloc se tient : heure ⇄ ciel ⇄ éclairage ⇄ grade).
-const WORLD_PRESETS: readonly WorldBible[] = [
-  {
+// Indexés par clé pour permettre un verrouillage de marque via pronoclip.config.json.
+export const WORLD_PRESETS: Record<WorldPresetKey, WorldBible> = {
+  night: {
     time_of_day: 'deep night',
     sky: 'deep indigo night sky, clear, no clouds',
     weather: 'cold, dry, still air',
@@ -26,7 +36,7 @@ const WORLD_PRESETS: readonly WorldBible[] = [
     crowd: 'dense silhouetted crowd wall with scattered phone-flash specks',
     grade: 'crushed blacks, cool blue shadows, warm gold highlights',
   },
-  {
+  dusk: {
     time_of_day: 'golden-hour dusk',
     sky: 'burnt-amber dusk sky fading to deep blue, thin high clouds',
     weather: 'warm, calm, still air',
@@ -35,7 +45,7 @@ const WORLD_PRESETS: readonly WorldBible[] = [
     crowd: 'dense silhouetted crowd wall catching low amber light',
     grade: 'warm amber midtones, long shadows, teal shadow tones',
   },
-  {
+  overcast: {
     time_of_day: 'overcast afternoon',
     sky: 'flat pale-grey overcast sky',
     weather: 'damp, heavy, windless air',
@@ -44,7 +54,34 @@ const WORLD_PRESETS: readonly WorldBible[] = [
     crowd: 'dense crowd wall under flat even light',
     grade: 'muted desaturated tones, soft contrast, cool neutral balance',
   },
-]
+}
+
+/** Preset de marque par défaut — verrouillé, identique pour toute une chaîne. */
+export const DEFAULT_WORLD_PRESET: WorldPresetKey = 'night'
+
+/** Bloc `world` tel qu'il vit dans pronoclip.config.json. */
+export interface WorldConfig {
+  vary_per_match?: boolean
+  preset?: WorldPresetKey
+  custom?: WorldBible
+}
+
+/** Traduit le bloc `world` de la config en sélection (câblage config → Match Bible). */
+export function worldSelectionFromConfig(cfg?: WorldConfig): WorldSelection {
+  if (cfg?.custom) return { mode: 'custom', world: cfg.custom }
+  if (cfg?.vary_per_match) return { mode: 'vary' }
+  return { mode: 'preset', preset: cfg?.preset ?? DEFAULT_WORLD_PRESET }
+}
+
+/** Résout le monde effectif. Défaut = preset de marque verrouillé (cohérence chaîne). */
+function resolveWorld(selection: WorldSelection | undefined, rng: () => number): WorldBible {
+  const sel = selection ?? { mode: 'preset', preset: DEFAULT_WORLD_PRESET }
+  if (sel.mode === 'custom') return sel.world
+  if (sel.mode === 'preset') return WORLD_PRESETS[sel.preset]
+  // mode 'vary' : tirage explicite par graine (cohérent dans la vidéo).
+  const keys = Object.keys(WORLD_PRESETS) as WorldPresetKey[]
+  return WORLD_PRESETS[keys[Math.floor(rng() * keys.length) % keys.length]]
+}
 
 const BUILDS = ['lean and wiry', 'tall and powerful', 'compact and muscular', 'broad-shouldered and athletic', 'slight and explosive']
 const HAIR = ['short cropped dark hair', 'a shaved head', 'curly black hair', 'tied-back long hair', 'short blond hair', 'a buzz cut with a headband']
@@ -71,7 +108,8 @@ export function buildMatchBible(input: MatchBibleInput): MatchBible {
   const seed = script.seed
   const rng = makeRng(seed)
 
-  const world = WORLD_PRESETS[Math.floor(rng() * WORLD_PRESETS.length) % WORLD_PRESETS.length]
+  // Monde : preset de marque verrouillé par défaut ; variation seulement si demandée.
+  const world = resolveWorld(input.world, rng)
 
   const homeKit = kitFor(home, 'deep royal blue')
   const awayKit = kitFor(away, 'crimson red')

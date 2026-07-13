@@ -1,5 +1,5 @@
 # 8 prompts d'image — Real Madrid 2-0 FC Barcelone
-# Match Bible verrouillé — monde : golden-hour dusk | grade : warm amber midtones, long shadows, teal shadow tones | seed : 1550747408
+# Match Bible verrouillé — monde : deep night | grade : crushed blacks, cool blue shadows, warm gold highlights | seed : 1550747408
 
 ══════════════════════════════════════════════════════════════════════════════
 PLAN 1/8 — team_reveal — Mbappé
@@ -20,7 +20,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
 
@@ -53,7 +53,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
 
@@ -86,7 +86,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 50mm eye-level framing.
 
@@ -119,7 +119,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
 
@@ -152,7 +152,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
 
@@ -185,7 +185,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
 
@@ -218,7 +218,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 35mm dynamic framing with motion arcs.
 
@@ -251,7 +251,7 @@ above-front, warm orange-gold fill on side shadows, sharp cool blue rim light on
 opposite silhouette. 4K, flawless 2D digital anime concept art, 9:16 portrait
 format, ultra-fine ink outline weight.
 
-World (identical in every shot): golden-hour dusk; burnt-amber dusk sky fading to deep blue, thin high clouds; warm, calm, still air; colossal four-tier bowl stadium, packed to the roof; floodlights just switched on, warm-to-cool mixed key light; dense silhouetted crowd wall catching low amber light. Colour grade: warm amber midtones, long shadows, teal shadow tones.
+World (identical in every shot): deep night; deep indigo night sky, clear, no clouds; cold, dry, still air; colossal four-tier bowl stadium, packed to the roof; eight banks of hard white floodlights, top-front key light; dense silhouetted crowd wall with scattered phone-flash specks. Colour grade: crushed blacks, cool blue shadows, warm gold highlights.
 
 Camera: vertical 9:16 portrait, 24mm low-angle hero framing.
 

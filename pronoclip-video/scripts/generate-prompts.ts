@@ -2,13 +2,20 @@
 // AUCUNE image n'est générée : ce script ne fait qu'assembler le texte des prompts
 // pour relecture avant la Phase 4. Lancer : `npm run prompts`.
 
-import { writeFileSync, mkdirSync } from 'node:fs'
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { buildMatchScript } from '../core/match-script'
-import { buildMatchBible } from '../core/match-bible'
+import { buildMatchBible, worldSelectionFromConfig, type WorldConfig } from '../core/match-bible'
 import { buildAllPrompts } from '../core/prompt-builder'
 import { realMadrid, barcelone, EXAMPLE_SEED } from './example-teams'
+
+const here = dirname(fileURLToPath(import.meta.url))
+
+// Câblage config → Match Bible : le monde est un défaut de marque VERROUILLÉ,
+// lu depuis pronoclip.config.json. Changer le preset ici change les 60 épisodes.
+const config = JSON.parse(readFileSync(resolve(here, '../pronoclip.config.json'), 'utf8')) as { world?: WorldConfig }
+const world = worldSelectionFromConfig(config.world)
 
 const script = buildMatchScript({
   home: realMadrid,
@@ -16,7 +23,7 @@ const script = buildMatchScript({
   competition: 'LaLiga',
   seed: EXAMPLE_SEED,
 })
-const bible = buildMatchBible({ script, home: realMadrid, away: barcelone })
+const bible = buildMatchBible({ script, home: realMadrid, away: barcelone, world })
 const prompts = buildAllPrompts(bible, script.shots)
 
 const lines: string[] = []
@@ -32,7 +39,6 @@ for (const p of prompts) {
 }
 const out = lines.join('\n')
 
-const here = dirname(fileURLToPath(import.meta.url))
 const outPath = resolve(here, '../examples/prompts.real-madrid-vs-barcelone.txt')
 mkdirSync(dirname(outPath), { recursive: true })
 writeFileSync(outPath, out + '\n', 'utf8')
