@@ -6,7 +6,6 @@
 
 import type { MatchBible, Shot } from './types'
 import { SCENE_FRAGMENTS } from './scene-fragments'
-import { NEGATIVE_BLOCK } from './scene-style'
 
 export interface VideoPromptOptions {
   durationSeconds?: number
@@ -20,9 +19,14 @@ export interface VideoPromptResult {
 
 // Verrou anti-morphing — la ligne qui empêche le visage/maillot de dériver.
 const IDENTITY_LOCK =
-  'CRITICAL: no morphing. Keep the character\'s face, hair, skin tone, build and kit ' +
-  'colour identical to the reference image throughout; do not change or redraw identity, ' +
-  'no face warping, no melting, no duplication.'
+  'CRITICAL: no morphing, keep the character\'s face, hair, skin tone, build and kit ' +
+  'colour identical to the reference frame throughout, no face warping, no jersey ' +
+  'colour change, no added text.'
+
+// Negative dédié image→vidéo (dérives typiques du i2v).
+const VIDEO_NEGATIVE =
+  'morphing, face morph, identity change, warping, melting, extra limbs, ' +
+  'jersey colour change, text, watermark'
 
 /** Construit le couple (video_prompt, negative_prompt) d'un plan pour l'image→vidéo. */
 export function buildVideoPrompt(
@@ -42,11 +46,5 @@ export function buildVideoPrompt(
     'Do not add any new text, numbers, scoreboard, captions or watermark.',
   ].join('\n')
 
-  const negativePrompt = [
-    NEGATIVE_BLOCK,
-    'morphing, face morph, identity change, face change, warping, melting, flicker,',
-    'extra limbs, duplicated player, jersey colour change, new text appearing',
-  ].join(' ')
-
-  return { videoPrompt, negativePrompt, durationSeconds }
+  return { videoPrompt, negativePrompt: VIDEO_NEGATIVE, durationSeconds }
 }

@@ -34,10 +34,11 @@
     "level": "motion",
     "_levels": ["motion", "animated"],
     "animated": {
-      "model": "kling-2.1-i2v",
-      "provider": "fal | replicate | kling-api",
+      "_comment": "model = endpoint du modèle image→vidéo (valeur de config, jamais en dur). Basculer vers Runway/Pika = changer ce champ, sans toucher l'adapter. provider pilote le transport (fal aujourd'hui).",
+      "provider": "fal",
+      "model": "fal-ai/kling-video/v2.1/standard/image-to-video",
       "duration_seconds": 5,
-      "cost_per_clip_usd_estimate": 0.30
+      "cost_per_clip_usd_estimate": 0.35
     }
   },
   "image": {
