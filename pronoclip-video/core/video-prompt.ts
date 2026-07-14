@@ -1,8 +1,9 @@
 // Prompts image→vidéo pour le tier `animated` (cf. MISSION §8).
-// Chaque plan : son image fixe = FIRST FRAME + un video_prompt (mouvement) + un
-// negative_prompt. Le mode d'échec classique de l'image→vidéo est le morphing du
-// visage / maillot → le prompt VERROUILLE l'identité sur l'image de référence.
-// Aucun texte n'est introduit (le texte reste overlay HTML au montage). Pur.
+// RÈGLE CENTRALE (plan de prod) : un clip = UN SEUL geste, fin nette. Jamais frappe +
+// célébration dans le même clip (c'est ce qui faisait apparaître le poteau de corner
+// fantôme). Les buts se découpent en deux beats : strike (fin sur le filet) et
+// celebration (beat séparé). L'image fixe = première frame ; l'identité est verrouillée.
+// Aucun texte/logo introduit (contrôle légal aussi sur les clips). Pur.
 
 import type { GoalType, MatchBible, Shot } from './types'
 import { GOAL_TYPES } from './types'
@@ -20,64 +21,52 @@ export interface VideoPromptResult {
 
 const GOAL_TYPE_SET = new Set<string>(GOAL_TYPES)
 
-// Verrou anti-morphing — la ligne qui empêche le visage/maillot de dériver.
+// Verrou anti-morphing.
 const IDENTITY_LOCK =
   'CRITICAL: no morphing, keep the character\'s face, hair, skin tone, build and kit ' +
   'colour identical to the reference frame throughout, no face warping, no jersey ' +
   'colour change, no added text.'
 
-// Caméra qui SUIT le ballon (cf. correction §3 révisée) — plus de locked camera : il
-// enfermait le joueur et l'obligeait à meubler les secondes vides.
-const CAMERA_TRACK =
-  'The camera tracks the ball from boot to net, then whips back to the striker.'
-
-// CHORÉGRAPHIE HORODATÉE des buts (cf. correction §2) — remplit les 5 s (durée min de
-// Kling) : frappe → vol du ballon → filet → célébration. Le ballon reste visible
-// jusqu'au filet ; le joueur n'entre jamais dans la cage.
-const CELEBRATION_TAIL =
-  '3-5s: the striker wheels away toward the corner flag, arms wide, roaring. ' +
-  'The ball is visible in every frame until it hits the net. The striker never enters the goal.'
-const GOAL_CHOREOGRAPHY: Record<GoalType, string> = {
+// Beat STRIKE : une seule action, se termine sur le filet qui se tend.
+const GOAL_STRIKE: Record<GoalType, string> = {
   goal_normal:
-    '0-1s: the striker plants his standing foot and swings his kicking leg through the ball. ' +
-    '1-2s: the ball leaves his boot and travels toward the bottom-right corner, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut, the keeper lands short. ' + CELEBRATION_TAIL,
+    'The striker swings through the ball; the ball travels to the bottom corner, motion-blurred; the net snaps violently taut.',
   goal_header:
-    '0-1s: the striker rises and meets the cross with a powerful downward header. ' +
-    '1-2s: the ball flies off his forehead toward the bottom corner, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut, the keeper lands short. ' + CELEBRATION_TAIL,
+    'The striker powers a downward header; the ball flies to the bottom corner, motion-blurred; the net snaps taut.',
   goal_volley:
-    '0-1s: the striker swings through a first-time volley on the dropping ball. ' +
-    '1-2s: the ball rockets toward the top corner, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut, the keeper beaten. ' + CELEBRATION_TAIL,
+    'The striker connects a first-time volley; the ball rockets to the top corner, motion-blurred; the net snaps taut.',
   goal_bicycle:
-    '0-1s: the striker completes an overhead bicycle kick, boot meeting the ball high. ' +
-    '1-2s: the ball loops over the keeper toward goal, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut. ' + CELEBRATION_TAIL,
+    'The striker completes an overhead bicycle kick; the ball loops over the keeper into the goal, motion-blurred; the net snaps taut.',
   goal_freekick:
-    '0-1s: the striker strikes the free kick, bending it up and over the wall. ' +
-    '1-2s: the ball curls toward the top corner, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut, the keeper stranded. ' + CELEBRATION_TAIL,
+    'The striker curls the free kick over the wall; the ball bends into the top corner, motion-blurred; the net snaps taut.',
   goal_penalty:
-    '0-1s: the striker strikes the penalty low and hard. ' +
-    '1-2s: the ball travels toward the corner as the keeper dives the other way, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut. ' + CELEBRATION_TAIL,
+    'The striker strikes the penalty; the ball flashes into the corner as the keeper dives the wrong way; the net snaps taut.',
   goal_longrange:
-    '0-1s: the midfielder plants and unleashes a long-range strike. ' +
-    '1-2s: the ball screams toward the top corner from distance, motion-blurred. ' +
-    '2-3s: the ball hits the net, the netting snaps violently taut, the keeper beaten. ' + CELEBRATION_TAIL,
+    'The midfielder unleashes a long-range strike; the ball screams into the top corner, motion-blurred; the net snaps taut.',
 }
+const STRIKE_END = ' The ball stays visible until it hits the net. End on the bulging net.'
 
-// Negative dédié image→vidéo : dérives i2v + dérives de "vide" (cf. diagnostic v2)
-// + logos/écussons hallucinés par le modèle en mouvement (fix légal, cf. Kling v3).
-const VIDEO_NEGATIVE =
-  'morphing, face morph, identity change, warping, melting, extra limbs, ' +
-  'jersey colour change, text, watermark, ' +
-  'club crest, team badge, competition logo, sponsor logo, brand logo, chest emblem, shirt number, ' +
-  'ball disappears, ball missing, player enters the goal, player inside the net, ' +
-  'duplicate goalposts, two goals, aimless walking, idle player'
+// Beat CELEBRATION : une seule action, se termine sur la glissade bras écartés.
+const CELEBRATION_BEAT =
+  'The striker runs a few strides and drops into a knee-slide, arms spread wide, roaring in ' +
+  'celebration. One continuous celebration, no ball. End on the knee-slide with arms wide.'
 
-/** Construit le couple (video_prompt, negative_prompt) d'un plan pour l'image→vidéo. */
+// Caméras par beat.
+const CAMERA_STRIKE = 'The camera tracks the ball from boot to net and ends on the net.'
+const CAMERA_CELEBRATION = 'The camera stays on the celebrating striker.'
+const CAMERA_GENERIC = 'Smooth cinematic camera move that keeps the subject in frame.'
+
+// Negative commun à tous les beats — dérives i2v + LOGOS/marques (fix légal, cf.
+// directives-legales.md : ni logo, ni écusson, ni sponsor).
+const BASE_NEGATIVE =
+  'morphing, face morph, identity change, warping, melting, extra limbs, jersey colour change, ' +
+  'text, watermark, brand logo, nike, adidas, puma, swoosh, club crest, sponsor logo, badge, ' +
+  'emblem, sponsor text, shirt number, aimless walking, idle player'
+// Spécifique aux beats de frappe (le ballon et la cage doivent rester cohérents).
+const STRIKE_NEGATIVE =
+  ', ball disappears, ball missing, player enters the goal, player inside the net, empty goal, ' +
+  'duplicate goalposts, two goals'
+
 export function buildVideoPrompt(
   bible: MatchBible,
   shot: Shot,
@@ -85,11 +74,24 @@ export function buildVideoPrompt(
 ): VideoPromptResult {
   const durationSeconds = opts.durationSeconds ?? 5
   const isGoal = GOAL_TYPE_SET.has(shot.sceneType)
-  // Buts : chorégraphie horodatée qui remplit toute la durée (pas d'action + vide).
-  const beat = isGoal
-    ? `Choreography (${durationSeconds} seconds): ${GOAL_CHOREOGRAPHY[shot.sceneType as GoalType]}`
-    : `Motion: ${SCENE_FRAGMENTS[shot.sceneType]}`
-  const cameraLine = isGoal ? CAMERA_TRACK : 'Smooth cinematic camera move that keeps the subject in frame.'
+  const isCelebration = shot.sceneType === 'celebration'
+
+  let beat: string
+  let cameraLine: string
+  let negativePrompt: string
+  if (isGoal) {
+    beat = `Single action: ${GOAL_STRIKE[shot.sceneType as GoalType]}${STRIKE_END}`
+    cameraLine = CAMERA_STRIKE
+    negativePrompt = BASE_NEGATIVE + STRIKE_NEGATIVE
+  } else if (isCelebration) {
+    beat = `Single action: ${CELEBRATION_BEAT}`
+    cameraLine = CAMERA_CELEBRATION
+    negativePrompt = BASE_NEGATIVE
+  } else {
+    beat = `Single action: ${SCENE_FRAGMENTS[shot.sceneType]}`
+    cameraLine = CAMERA_GENERIC
+    negativePrompt = BASE_NEGATIVE
+  }
 
   const videoPrompt = [
     'Animate the provided still image as the exact first frame.',
@@ -101,5 +103,5 @@ export function buildVideoPrompt(
     'Do not add any new text, numbers, scoreboard, captions or watermark.',
   ].join('\n')
 
-  return { videoPrompt, negativePrompt: VIDEO_NEGATIVE, durationSeconds }
+  return { videoPrompt, negativePrompt, durationSeconds }
 }

@@ -46,4 +46,5 @@ export const NEGATIVE_BLOCK_ANIMATED = `2D, anime, manga, cel-shaded, hand-drawn
 illustration, comic, line art, cartoon, sketch, watercolour, blurry, watermark,
 deformed hands, extra fingers, low quality, jpeg artifacts, text, letters, numbers,
 captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+brand logo, nike, adidas, puma, swoosh, badge, emblem, sponsor text, shirt number,
 shirt name, identifiable real player faces, real-person likeness`

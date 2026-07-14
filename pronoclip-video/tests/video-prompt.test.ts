@@ -23,21 +23,37 @@ describe('buildVideoPrompt — verrou anti-morphing (visage + maillot)', () => {
     expect(videoPrompt).toMatch(/new text/i)
     expect(videoPrompt).toMatch(/watermark|scoreboard/i)
   })
-  it('but : chorégraphie horodatée + caméra qui suit le ballon (cf. corrections §2/§3)', () => {
-    const { videoPrompt, negativePrompt } = buildVideoPrompt(bible, goalShot)
-    // chorégraphie horodatée (remplit les 5 s), pas une action unique
-    expect(videoPrompt).toMatch(/0-1s/)
-    expect(videoPrompt).toMatch(/2-3s/)
-    expect(videoPrompt).toMatch(/3-5s/)
-    expect(videoPrompt).toMatch(/ball is visible in every frame/i)
-    expect(videoPrompt).toMatch(/never enters the goal/i)
-    // caméra qui suit le ballon (plus de locked camera)
+})
+
+describe('beat FRAPPE : une seule action, fin nette sur le filet (plan de prod)', () => {
+  const { videoPrompt, negativePrompt } = buildVideoPrompt(bible, goalShot)
+  it('une action, fin sur le filet, ballon visible jusqu’au filet, PAS de célébration', () => {
+    expect(videoPrompt).toMatch(/single action/i)
+    expect(videoPrompt).toMatch(/net snaps|bulging net/i)
+    expect(videoPrompt).toMatch(/ball stays visible until it hits the net/i)
+    expect(videoPrompt).toMatch(/end on the bulging net/i)
     expect(videoPrompt).toMatch(/tracks the ball/i)
-    expect(videoPrompt).not.toMatch(/locked camera/i)
-    // négatifs anti-vide
+    expect(videoPrompt).not.toMatch(/corner flag|celebration|knee-slide/i)
+    expect(videoPrompt).not.toMatch(/0-1s|3-5s/) // plus de chorégraphie multi-actes
+  })
+  it('negatives : anti-vide + anti-logos (fix légal)', () => {
     expect(negativePrompt).toMatch(/ball disappears|ball missing/i)
-    expect(negativePrompt).toMatch(/player inside the net|player enters the goal/i)
-    expect(negativePrompt).toMatch(/two goals|duplicate goalposts/i)
+    expect(negativePrompt).toMatch(/player inside the net/i)
+    expect(negativePrompt).toMatch(/nike|swoosh|club crest|sponsor logo|brand logo/i)
+  })
+})
+
+describe('beat CÉLÉBRATION : beat séparé, une seule action, sans ballon', () => {
+  const celeb = script.shots.find(s => s.sceneType === 'celebration')!
+  const { videoPrompt, negativePrompt } = buildVideoPrompt(bible, celeb)
+  it('une action de célébration, sans ballon, fin nette, PAS de frappe', () => {
+    expect(videoPrompt).toMatch(/single action/i)
+    expect(videoPrompt).toMatch(/knee-slide|arms spread wide/i)
+    expect(videoPrompt).toMatch(/no ball/i)
+    expect(videoPrompt).not.toMatch(/net snaps|bulging net/i)
+  })
+  it('negatives anti-logos présents', () => {
+    expect(negativePrompt).toMatch(/nike|swoosh|club crest|sponsor logo|brand logo/i)
   })
 })
 
