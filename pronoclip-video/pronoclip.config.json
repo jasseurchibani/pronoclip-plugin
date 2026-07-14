@@ -34,11 +34,22 @@
     "level": "motion",
     "_levels": ["motion", "animated"],
     "animated": {
-      "_comment": "model = endpoint du modèle image→vidéo (valeur de config, jamais en dur). Basculer vers Runway/Pika = changer ce champ, sans toucher l'adapter. provider pilote le transport (fal aujourd'hui).",
+      "_comment": "model = endpoint du modèle image→vidéo (valeur de config, jamais en dur). Changer ce champ pour tester un autre modèle ; l'adaptateur mappe l'entrée par famille. Prix vérifiés sur fal.ai (clip 5 s, audio off).",
       "provider": "fal",
-      "model": "fal-ai/kling-video/v2.1/standard/image-to-video",
+      "model": "fal-ai/kling-video/v3/pro/image-to-video",
       "duration_seconds": 5,
-      "cost_per_clip_usd_estimate": 0.35
+      "cost_per_clip_usd_estimate": 0.56,
+      "_alternatives": {
+        "fal-ai/kling-video/v2.1/standard/image-to-video": "$0.28",
+        "fal-ai/kling-video/v2.1/pro/image-to-video": "$0.80",
+        "fal-ai/kling-video/v2.6/pro/image-to-video": "$0.35",
+        "fal-ai/kling-video/v3/pro/image-to-video": "$0.56",
+        "fal-ai/kling-video/o3/standard/image-to-video": "voir fal",
+        "fal-ai/veo3.1/image-to-video": "$1.00 (audio off) / $2.00 (audio on)",
+        "fal-ai/veo3.1/fast/image-to-video": "$0.50 (audio off)",
+        "fal-ai/sora-2/image-to-video": "$0.50 ($0.10/s)",
+        "bytedance/seedance-2.0/image-to-video": "$1.51 ($0.3024/s)"
+      }
     }
   },
   "image": {

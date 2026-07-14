@@ -16,6 +16,32 @@ export interface FalClipOptions {
   onLog?: (message: string) => void
 }
 
+/**
+ * Mappe la requête générique vers le schéma d'entrée du modèle (les familles fal
+ * diffèrent). Ajouter un modèle d'une famille connue = zéro changement ; une nouvelle
+ * famille = une branche ici, jamais une réécriture. C'est ce qui garde `model` en config.
+ */
+export function buildFalInput(model: string, req: ClipRequest, imageUrl: string): Record<string, unknown> {
+  const isKlingV3orO3 = /kling-video\/(v3|o3)/.test(model)
+  const isKling = /kling-video/.test(model)
+  const isSeedance = /seedance/.test(model)
+
+  const input: Record<string, unknown> = {
+    prompt: req.videoPrompt,
+    duration: String(req.durationSeconds),
+  }
+  // Clé de l'image de départ : v3/o3 = start_image_url ; sinon image_url.
+  if (isKlingV3orO3) input.start_image_url = imageUrl
+  else input.image_url = imageUrl
+  // Negative prompt : supporté par Kling & Seedance.
+  if (isKling || isSeedance) input.negative_prompt = req.negativePrompt
+  // Ratio explicite seulement pour Kling v2.x (v3 le déduit de l'image).
+  if (/kling-video\/v2/.test(model)) input.aspect_ratio = '9:16'
+  // Audio désactivé là où c'est un paramètre connu (sortie muette + moins cher).
+  if (/kling-video\/(v3|o3|v2\.6)/.test(model)) input.generate_audio = false
+  return input
+}
+
 /** Construit un ClipInvoke fal.ai : image fixe → première frame → clip i2v vertical 9:16. */
 export function makeFalClipInvoke(opts: FalClipOptions): ClipInvoke {
   fal.config({ credentials: opts.apiKey })
@@ -26,15 +52,9 @@ export function makeFalClipInvoke(opts: FalClipOptions): ClipInvoke {
     const type = req.firstFrame.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg'
     const imageUrl = await fal.storage.upload(new Blob([bytes], { type }))
 
-    // 2) Soumission i2v. Schéma d'entrée Kling (fal) : image_url + prompt + negative + duration + aspect_ratio.
+    // 2) Soumission i2v (input mappé selon la famille du modèle).
     const result = await fal.subscribe(opts.model, {
-      input: {
-        prompt: req.videoPrompt,
-        negative_prompt: req.negativePrompt,
-        image_url: imageUrl,
-        duration: String(req.durationSeconds),
-        aspect_ratio: '9:16',
-      },
+      input: buildFalInput(opts.model, req, imageUrl),
       logs: true,
       onQueueUpdate: (u: { status: string; logs?: { message: string }[] }) => {
         if (opts.onLog && u.status === 'IN_PROGRESS') {

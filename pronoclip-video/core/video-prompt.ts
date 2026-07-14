@@ -68,10 +68,12 @@ const GOAL_CHOREOGRAPHY: Record<GoalType, string> = {
     '2-3s: the ball hits the net, the netting snaps violently taut, the keeper beaten. ' + CELEBRATION_TAIL,
 }
 
-// Negative dédié image→vidéo : dérives i2v + dérives de "vide" (cf. diagnostic v2).
+// Negative dédié image→vidéo : dérives i2v + dérives de "vide" (cf. diagnostic v2)
+// + logos/écussons hallucinés par le modèle en mouvement (fix légal, cf. Kling v3).
 const VIDEO_NEGATIVE =
   'morphing, face morph, identity change, warping, melting, extra limbs, ' +
   'jersey colour change, text, watermark, ' +
+  'club crest, team badge, competition logo, sponsor logo, brand logo, chest emblem, shirt number, ' +
   'ball disappears, ball missing, player enters the goal, player inside the net, ' +
   'duplicate goalposts, two goals, aimless walking, idle player'
 
