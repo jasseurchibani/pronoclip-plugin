@@ -5,7 +5,7 @@
 // de teams[side].aura. Aucun texte/chiffre/nom. Chaque goal_* montre le ballon franchir
 // la ligne ou le filet se tendre (correction du bug goal_penalty qui s'arrêtait à l'élan).
 
-import type { SceneType } from './types'
+import type { GoalType, SceneType } from './types'
 
 export const SCENE_FRAGMENTS: Record<SceneType, string> = {
   team_reveal:
@@ -88,4 +88,34 @@ export const SCENE_FRAGMENTS: Record<SceneType, string> = {
   final_result:
     'The victorious athlete stands tall at center frame, arms spread wide and raised, chest ' +
     'heaving, eyes closed in a long exhale of triumph; a slow majestic pull-back with a slight crane up.',
+}
+
+/**
+ * Variante FIRST FRAME des buts, pour le tier `animated` (cf. correction §1).
+ * L'image fixe montre l'INSTANT AVANT (setup) — pas le but déjà marqué — pour que le
+ * modèle image→vidéo ait l'action à délivrer (frappe → vol du ballon → filet).
+ * Action/pose uniquement, aucun décor, aucun ballon déjà dans le filet.
+ */
+export const GOAL_FIRST_FRAME: Record<GoalType, string> = {
+  goal_normal:
+    'The striker plants his standing foot and cocks his kicking leg fully back, the ball ' +
+    'sitting at his boot, the goalkeeper set and spread on his line — the frozen instant before the shot.',
+  goal_header:
+    'The striker coils and begins to rise for a header, eyes locked on the incoming ball ' +
+    'above him, the goalkeeper set on his line — the frozen instant before contact.',
+  goal_volley:
+    'The striker leans back and draws his boot toward the dropping ball at hip height, body ' +
+    'torqued, the goalkeeper set — the frozen instant before the volley.',
+  goal_bicycle:
+    'The striker launches off the turf, body inverting for an overhead bicycle kick, boot ' +
+    'swinging up toward the ball, the goalkeeper watching — the frozen instant before contact.',
+  goal_freekick:
+    'The striker stands over the dead ball at the end of his run-up, plant foot beside it, ' +
+    'a defensive wall braced ahead, the goalkeeper set — the frozen instant before the free kick.',
+  goal_penalty:
+    'The striker takes the final stride into the ball on the penalty spot, kicking leg drawn ' +
+    'back, the goalkeeper crouched and spread — the frozen instant before the penalty is struck.',
+  goal_longrange:
+    'The midfielder plants from distance and swings his leg fully back to strike, the ball ' +
+    'ahead of his boot, the goalkeeper set deep — the frozen instant before the long-range shot.',
 }

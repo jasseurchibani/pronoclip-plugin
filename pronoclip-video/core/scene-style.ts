@@ -25,3 +25,25 @@ shading, chibi, oversized cartoon eyes, blurry, watermark, deformed hands, extra
 fingers, realistic photograph, low quality, jpeg artifacts, text, letters, numbers,
 captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
 shirt name, identifiable real player faces, real-person likeness`
+
+// ── Tier ANIMATED (image→vidéo) : 3D cinématique ─────────────────────────────
+// On ne se bat plus contre le prior vidéo-réel du modèle i2v (cf. correction §2) :
+// le style est un rendu 3D cinématique « moteur de jeu haut de gamme » (type
+// cinématique EA Sports). Ainsi la première frame et la dernière sont dans le MÊME
+// registre — plus d'effondrement anime→3D. Réservé au tier animated ; le tier motion
+// garde STYLE_BLOCK (anime 2D).
+export const STYLE_BLOCK_ANIMATED = `A premium cinematic 3D render in the style of a
+high-end sports video-game cinematic (next-gen console intro, EA Sports FC style):
+stylised-realistic 3D athletes, physically based rendering, realistic skin and cloth
+shading with subsurface detail, dramatic volumetric stadium lighting, filmic depth of
+field, motion-graphics polish, high-contrast cinematic colour grade. Fully realistic
+human proportions and anatomy, expressive but grounded faces. Plain solid-colour kit,
+absolutely no crest, no badge, no sponsor, no lettering and no number on the kit. 4K,
+ultra-detailed real-time cinematic 3D, 9:16 portrait framing.`
+
+// NEGATIVE inversé pour le tier animated : on bannit le 2D/anime (garde le reste).
+export const NEGATIVE_BLOCK_ANIMATED = `2D, anime, manga, cel-shaded, hand-drawn, flat
+illustration, comic, line art, cartoon, sketch, watercolour, blurry, watermark,
+deformed hands, extra fingers, low quality, jpeg artifacts, text, letters, numbers,
+captions, scoreboard, score, club crest, team badge, competition logo, sponsor logo,
+shirt name, identifiable real player faces, real-person likeness`

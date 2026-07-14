@@ -4,13 +4,22 @@
 // L'aura vient de teams[side].aura, jamais du fragment. Aucun texte/chiffre/nom
 // n'est demandé dans l'image. Pur : aucune I/O.
 
-import type { CharacterLikeness, MatchBible, SceneType, Shot } from './types'
-import { STYLE_BLOCK, NEGATIVE_BLOCK } from './scene-style'
-import { SCENE_FRAGMENTS } from './scene-fragments'
+import type { CharacterLikeness, GoalType, MatchBible, RenderLevel, SceneType, Shot } from './types'
+import { GOAL_TYPES } from './types'
+import { STYLE_BLOCK, NEGATIVE_BLOCK, STYLE_BLOCK_ANIMATED, NEGATIVE_BLOCK_ANIMATED } from './scene-style'
+import { SCENE_FRAGMENTS, GOAL_FIRST_FRAME } from './scene-fragments'
+
+const GOAL_TYPE_SET = new Set<string>(GOAL_TYPES)
 
 export interface PromptOptions {
   /** Défaut `independent` : cadrage « visage non-ancre » (cf. décision A2, Option 5). */
   characterLikeness?: CharacterLikeness
+  /**
+   * Tier de rendu (cf. corrections §1/§2) — pilote style, negative ET la variante des
+   * fragments de but : `motion` = anime 2D + but marqué (still) ; `animated` = 3D
+   * cinématique + instant AVANT le but (first frame que le modèle i2v anime).
+   */
+  renderLevel?: RenderLevel
 }
 
 // Directive « visage non-ancre » (appliquée à TOUS les plans quand likeness=independent).
@@ -95,6 +104,14 @@ function subjectBlock(bible: MatchBible, shot: Shot): string {
 export function buildImagePrompt(bible: MatchBible, shot: Shot, opts: PromptOptions = {}): string {
   const likeness: CharacterLikeness = opts.characterLikeness ?? 'independent'
   const faceNotAnchor = likeness === 'independent'
+  const animated = (opts.renderLevel ?? 'motion') === 'animated'
+
+  // Style / negative / fragment conditionnels au tier (cf. corrections §1/§2).
+  const styleBlock = animated ? STYLE_BLOCK_ANIMATED : STYLE_BLOCK
+  const negBlock = animated ? NEGATIVE_BLOCK_ANIMATED : NEGATIVE_BLOCK
+  const isGoal = GOAL_TYPE_SET.has(shot.sceneType)
+  // Tier animated + but → variante « instant avant » (first frame que l'i2v anime).
+  const action = animated && isGoal ? GOAL_FIRST_FRAME[shot.sceneType as GoalType] : SCENE_FRAGMENTS[shot.sceneType]
 
   const cameraLine = faceNotAnchor
     ? `Camera: ${bible.camera.format}, ${cameraFor(bible, shot.sceneType)}; ${FACE_NOT_ANCHOR}.`
@@ -106,12 +123,12 @@ export function buildImagePrompt(bible: MatchBible, shot: Shot, opts: PromptOpti
     : subject
 
   return [
-    STYLE_BLOCK,
+    styleBlock,
     worldBlock(bible),
     cameraLine,
     subjectLine,
-    `Action: ${SCENE_FRAGMENTS[shot.sceneType]}`,
-    `Negative: ${NEGATIVE_BLOCK}.`,
+    `Action: ${action}`,
+    `Negative: ${negBlock}.`,
   ].join('\n\n')
 }
 

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { buildMatchScript } from '../core/match-script'
 import { buildMatchBible } from '../core/match-bible'
 import { buildImagePrompt, buildAllPrompts } from '../core/prompt-builder'
-import { SCENE_FRAGMENTS } from '../core/scene-fragments'
+import { SCENE_FRAGMENTS, GOAL_FIRST_FRAME } from '../core/scene-fragments'
 import type { GoalType, Shot } from '../core/types'
 import { HOME, AWAY } from './fixtures'
 
@@ -32,6 +32,39 @@ describe('fragments : action/pose/caméra uniquement (aucun décor)', () => {
   it('aucun fragment ne fixe une couleur d’aura', () => {
     for (const [key, frag] of Object.entries(SCENE_FRAGMENTS)) {
       expect(frag, key).not.toMatch(/white aura|blue aura|golden aura|red aura/i)
+    }
+  })
+})
+
+describe('tier animated : 3D cinématique + but « instant avant » (corrections §1/§2)', () => {
+  const goalShot = script.shots.find(s => s.goalType)!
+
+  it('animated → style 3D cinématique, negative bannit le 2D/anime', () => {
+    const p = buildImagePrompt(bible, goalShot, { renderLevel: 'animated' })
+    expect(p).toMatch(/cinematic 3D|video-game cinematic|EA Sports/i)
+    expect(p.split('Negative:')[1]).toMatch(/\banime\b/i)
+  })
+
+  it('animated + but → setup (instant avant), PAS le ballon déjà dans le filet', () => {
+    const p = buildImagePrompt(bible, goalShot, { renderLevel: 'animated' })
+    const beforeNegative = p.split('Negative:')[0]
+    expect(beforeNegative).toMatch(/instant before|frozen instant/i)
+    expect(beforeNegative).not.toMatch(/rips into the .*net|net snapping|into the net/i)
+  })
+
+  it('motion (défaut) → anime + but marqué (still, filet)', () => {
+    const p = buildImagePrompt(bible, goalShot, { renderLevel: 'motion' })
+    expect(p).toMatch(/anime/i)
+    expect(p.split('Negative:')[0]).toMatch(/net/i)
+  })
+})
+
+describe('GOAL_FIRST_FRAME : setup sans décor ni but déjà marqué', () => {
+  const DECOR = /stadium|floodlight|crowd|\bsky\b|\bnight\b/i
+  it('aucune variante first-frame ne montre le ballon dans le filet ni de décor', () => {
+    for (const [key, frag] of Object.entries(GOAL_FIRST_FRAME)) {
+      expect(frag, key).not.toMatch(/into the net|net snapping|side netting|rips/i)
+      expect(frag, key).not.toMatch(DECOR)
     }
   })
 })

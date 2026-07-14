@@ -23,10 +23,15 @@ const IDENTITY_LOCK =
   'colour identical to the reference frame throughout, no face warping, no jersey ' +
   'colour change, no added text.'
 
-// Negative dédié image→vidéo (dérives typiques du i2v).
+// Caméra verrouillée (cf. correction §3) — empêche le travelling qui quitte l'action.
+const CAMERA_LOCK =
+  'Locked camera, no camera movement. The subject remains centered in frame for the entire duration.'
+
+// Negative dédié image→vidéo (dérives typiques du i2v) + dérives de caméra.
 const VIDEO_NEGATIVE =
   'morphing, face morph, identity change, warping, melting, extra limbs, ' +
-  'jersey colour change, text, watermark'
+  'jersey colour change, text, watermark, ' +
+  'camera pans away, camera flies through the net, subject exits frame, empty goal, no subject'
 
 /** Construit le couple (video_prompt, negative_prompt) d'un plan pour l'image→vidéo. */
 export function buildVideoPrompt(
@@ -42,6 +47,7 @@ export function buildVideoPrompt(
     `Motion: ${action}`,
     'Preserve the art style, colour grade, lighting and composition of the reference frame.',
     `Vertical 9:16, ${durationSeconds} seconds, smooth high-quality motion, consistent physics.`,
+    CAMERA_LOCK,
     IDENTITY_LOCK,
     'Do not add any new text, numbers, scoreboard, captions or watermark.',
   ].join('\n')

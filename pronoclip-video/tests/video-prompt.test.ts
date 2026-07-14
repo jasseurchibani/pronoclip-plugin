@@ -23,6 +23,13 @@ describe('buildVideoPrompt — verrou anti-morphing (visage + maillot)', () => {
     expect(videoPrompt).toMatch(/new text/i)
     expect(videoPrompt).toMatch(/watermark|scoreboard/i)
   })
+  it('verrouille la caméra (cf. correction §3)', () => {
+    const { videoPrompt, negativePrompt } = buildVideoPrompt(bible, goalShot)
+    expect(videoPrompt).toMatch(/locked camera/i)
+    expect(videoPrompt).toMatch(/remains centered/i)
+    expect(negativePrompt).toMatch(/camera pans away/i)
+    expect(negativePrompt).toMatch(/subject exits frame|empty goal/i)
+  })
 })
 
 describe('resolveRenderLevel — animated en opt-in explicite (motion par défaut)', () => {
