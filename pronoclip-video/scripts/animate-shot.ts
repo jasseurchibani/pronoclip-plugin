@@ -67,6 +67,6 @@ const { video_url } = await generateClip({ firstFrame, videoPrompt, negativeProm
 console.log('Clip généré :', video_url)
 const res = await fetch(video_url)
 if (!res.ok) throw new Error('Téléchargement échoué : ' + res.status)
-const outPath = resolve(here, '../pronoclip-output/animated_plan4_mbappe_kling_v2.mp4')
+const outPath = resolve(here, '../pronoclip-output/animated_plan4_mbappe_kling_v3.mp4')
 writeFileSync(outPath, Buffer.from(await res.arrayBuffer()))
 console.log('MP4 écrit :', outPath)

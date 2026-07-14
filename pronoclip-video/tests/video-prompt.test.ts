@@ -23,12 +23,21 @@ describe('buildVideoPrompt — verrou anti-morphing (visage + maillot)', () => {
     expect(videoPrompt).toMatch(/new text/i)
     expect(videoPrompt).toMatch(/watermark|scoreboard/i)
   })
-  it('verrouille la caméra (cf. correction §3)', () => {
+  it('but : chorégraphie horodatée + caméra qui suit le ballon (cf. corrections §2/§3)', () => {
     const { videoPrompt, negativePrompt } = buildVideoPrompt(bible, goalShot)
-    expect(videoPrompt).toMatch(/locked camera/i)
-    expect(videoPrompt).toMatch(/remains centered/i)
-    expect(negativePrompt).toMatch(/camera pans away/i)
-    expect(negativePrompt).toMatch(/subject exits frame|empty goal/i)
+    // chorégraphie horodatée (remplit les 5 s), pas une action unique
+    expect(videoPrompt).toMatch(/0-1s/)
+    expect(videoPrompt).toMatch(/2-3s/)
+    expect(videoPrompt).toMatch(/3-5s/)
+    expect(videoPrompt).toMatch(/ball is visible in every frame/i)
+    expect(videoPrompt).toMatch(/never enters the goal/i)
+    // caméra qui suit le ballon (plus de locked camera)
+    expect(videoPrompt).toMatch(/tracks the ball/i)
+    expect(videoPrompt).not.toMatch(/locked camera/i)
+    // négatifs anti-vide
+    expect(negativePrompt).toMatch(/ball disappears|ball missing/i)
+    expect(negativePrompt).toMatch(/player inside the net|player enters the goal/i)
+    expect(negativePrompt).toMatch(/two goals|duplicate goalposts/i)
   })
 })
 
