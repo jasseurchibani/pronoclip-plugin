@@ -42,10 +42,13 @@ function buildTimeline(script: MatchScript, images: string[], shotMs: number) {
       if (s.teamSide === 'home') home++
       else if (s.teamSide === 'away') away++
     }
+    // side : pilote le panneau généré (fallback sans image) — teinte home/away/both.
+    const side = s.teamSide === 'home' || s.teamSide === 'away' || s.teamSide === 'both' ? s.teamSide : 'none'
     return {
       src: images[i] ?? '',
       sceneType: s.sceneType,
       motion: kenBurns(s.sceneType),
+      side,
       caption: s.caption,
       scorer: isGoal ? s.playerName : null,
       goalType: isGoal ? (GOAL_TYPE_LABELS[s.goalType!] ?? '') : null,
@@ -94,6 +97,15 @@ export function buildComposition(input: CompositionInput): string {
   #layers .shot{opacity:0;}
   #layers .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
     transform-origin:center;will-change:transform,opacity;}
+  /* Panneau généré (fallback sans image) — dégradé on-charte, teinté par camp. Le texte
+     reste 100% overlay ; le panneau est purement graphique. Accent EN ACCENT (filet). */
+  #layers .shot .panel{position:absolute;inset:0;transform-origin:center;will-change:transform;
+    background:radial-gradient(circle at 50% 40%,#191919,${bg} 72%);}
+  #layers .shot .panel.home{background:radial-gradient(circle at 50% 38%,rgba(51,120,220,.30),${bg} 68%);}
+  #layers .shot .panel.away{background:radial-gradient(circle at 50% 38%,rgba(220,60,60,.28),${bg} 68%);}
+  #layers .shot .panel.both{background:radial-gradient(circle at 50% 38%,#1e211d,${bg} 70%);}
+  #layers .shot .panel::after{content:"";position:absolute;left:8%;right:8%;bottom:33%;height:2px;
+    background:linear-gradient(90deg,transparent,${accent},transparent);opacity:.55;}
   /* Score-bug (haut) — accent EN ACCENT (filet), jamais en aplat */
   #scorebug{position:absolute;top:3%;left:50%;transform:translateX(-50%);display:flex;align-items:center;
     gap:.5rem;padding:.4rem .9rem;background:rgba(10,10,10,.72);border-bottom:2px solid ${accent};
@@ -125,7 +137,10 @@ export function buildComposition(input: CompositionInput): string {
   var D=JSON.parse(document.getElementById('pronoclip-data').textContent);
   var layers=document.getElementById('layers');
   D.shots.forEach(function(s){var d=document.createElement('div');d.className='shot';
-    var img=document.createElement('img');img.src=s.src;d.appendChild(img);layers.appendChild(d);});
+    var media;
+    if(s.src){media=document.createElement('img');media.src=s.src;}
+    else{media=document.createElement('div');media.className='panel '+(s.side||'none');} // panneau généré
+    d.appendChild(media);layers.appendChild(d);});
   var shotEls=[].slice.call(layers.children);
   var wm=document.getElementById('watermark');wm.textContent=${JSON.stringify(watermark)};
   var ec=document.querySelector('#endcard .ec-inner');
@@ -156,8 +171,9 @@ export function buildComposition(input: CompositionInput): string {
       var img=el.firstChild;
       if(on)img.style.transform=motionTransform(s.motion,Math.max(0,Math.min(1,local)));
     });
-    cap.textContent=s.caption||'';
-    scorer.textContent=s.scorer?(s.goalType+' : '+s.scorer):'';
+    // Overlays §8 séparés : gros = type de but (buts) ou caption de scène ; sous = buteur.
+    cap.textContent=s.isGoal?(s.goalType||'BUT'):(s.caption||'');
+    scorer.textContent=s.scorer||'';
     scorer.style.display=s.scorer?'block':'none';
     scH.textContent=s.home;scA.textContent=s.away;
     // flash du score-bug ~.5s après un but

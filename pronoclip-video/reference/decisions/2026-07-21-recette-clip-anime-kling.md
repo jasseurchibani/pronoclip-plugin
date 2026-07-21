@@ -23,8 +23,16 @@ Conséquences immédiates :
 ### 2.1 Modèle & transport
 - **Kling 3.0** via **fal.ai** — `fal-ai/kling-video/v3/pro/image-to-video`.
 - Vertical **9:16**, **audio off** (sortie muette, moins chère ; le son est muxé à part).
-- Coût vérifié : **≈ 0,56 $ / clip** (5 s). Le nom du modèle vit en **config**
-  (`render.animated.model`), jamais en dur → changer de modèle = changer la config.
+- Coût vérifié : **≈ 0,56 $ / clip** (5 s) — c'est le **tier `pro`**. Le nom du modèle vit
+  en **config** (`render.animated.model`), jamais en dur → changer de modèle = changer la config.
+
+> **⚠️ Coût réel par vidéo** : le clip de test a utilisé le tier **`pro`** (~0,56 $). Une
+> vidéo complète = 8 plans + buts découpés en 2 beats ≈ **~9–10 clips → ~5 $/vidéo**, pas 3.
+> À la réactivation, **tester d'abord un tier moins cher** avant de figer le prix (déjà en
+> config sous `render.animated._alternatives`) :
+> `fal-ai/kling-video/v2.1/standard/image-to-video` (**$0.28**, ~2,8 $/vidéo) ou
+> `fal-ai/kling-video/v2.6/pro/image-to-video` (**$0.35**, ~3,5 $/vidéo). Comparer le drift
+> de visage (§3) : si le std tient, l'économie est de moitié.
 
 ### 2.2 Un clip = UN SEUL geste (~3,5–4,5 s), fin nette
 La règle centrale. **Jamais frappe + célébration dans le même clip** : c'est ce qui
@@ -72,6 +80,15 @@ i2v est précisément pourquoi la prod **désancre le visage** (contre-jour, pla
 visage dans l'ombre). Tant que le visage n'est pas l'ancre du plan, le drift est invisible.
 Le clip plein-cadre du test l'exposait volontairement — pour le **mesurer**, pas pour le
 mettre en prod.
+
+**Ce que corrige (et ne corrige PAS) B2/`edit_image`** — important, car ça recadre
+l'attente côté RapidoCMS : le portrait de référence passé à `edit_image`/`images.edit`
+verrouille la cohérence **ENTRE les plans** (le même visage réapparaît d'un plan à l'autre)
+— **pas DANS un plan animé** (le modèle i2v reste libre de dériver au fil des frames d'un
+même clip). Conséquence directe : `edit_image` **n'est pas** un remède au drift intra-clip
+— c'est un **argument de plus pour des beats courts** (moins de frames = moins de dérive) et
+pour le désancrage du visage. On attendra donc d'`edit_image` la **constance inter-plans**,
+et de la **durée courte** la constance intra-plan.
 
 ## 4. Où la recette est implémentée (ne pas dupliquer)
 
