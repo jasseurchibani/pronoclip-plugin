@@ -68,7 +68,8 @@
     "metadata": "Vidéo générée par intelligence artificielle. Contenu de divertissement — aucun pari, aucune mise, aucun gain."
   },
   "voice": {
-    "provider": "elevenlabs",
+    "_comment": "Cascade TTS : GRATUIT par défaut (tts_provider=sapi = SAPI local fr-FR ; kokoro via hyperframes CLI quand présent). elevenlabs = OPT-IN payant (--voice=elevenlabs ou tts_provider ici). Jamais de bascule silencieuse vers le payant (cf. skill audio-narration). L'ancien champ 'provider' (legacy, ambigu) a été retiré en Phase 3.",
+    "tts_provider": "sapi",
     "elevenlabs_voice_id": "onwK4e9ZLuTAKqWW03F9",
     "elevenlabs_model": "eleven_multilingual_v2"
   }
