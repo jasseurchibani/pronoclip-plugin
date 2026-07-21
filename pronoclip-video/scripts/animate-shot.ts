@@ -14,7 +14,7 @@ import { buildVideoPrompt } from '../core/video-prompt'
 import { resolveRenderLevel } from '../core/render-guard'
 import { makeClipGenerator } from '../adapters/mcp'
 import { makeFalClipInvoke } from '../adapters/fal'
-import { realMadrid, barcelone, EXAMPLE_SEED } from './example-teams'
+import { france, espagne, EXAMPLE_SEED } from './example-teams'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const config = JSON.parse(readFileSync(resolve(here, '../pronoclip.config.json'), 'utf8'))
@@ -27,8 +27,8 @@ if (level !== 'animated') {
   process.exit(0)
 }
 
-const script = buildMatchScript({ home: realMadrid, away: barcelone, competition: 'LaLiga', seed: EXAMPLE_SEED })
-const bible = buildMatchBible({ script, home: realMadrid, away: barcelone })
+const script = buildMatchScript({ home: france, away: espagne, competition: 'Ligue des Nations', seed: EXAMPLE_SEED })
+const bible = buildMatchBible({ script, home: france, away: espagne })
 
 // Beat ciblé : --shot=N (1-based). Défaut 4 (but de Mbappé). Chaque beat = 1 geste.
 const shotArg = process.argv.find(a => a.startsWith('--shot='))

@@ -9,7 +9,7 @@ import { buildMatchScript } from '../core/match-script'
 import { buildMatchBible, worldSelectionFromConfig, type WorldConfig } from '../core/match-bible'
 import { buildAllPrompts } from '../core/prompt-builder'
 import type { CharacterLikeness } from '../core/types'
-import { realMadrid, barcelone, EXAMPLE_SEED } from './example-teams'
+import { france, espagne, EXAMPLE_SEED } from './example-teams'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
@@ -23,12 +23,12 @@ const world = worldSelectionFromConfig(config.world)
 const characterLikeness: CharacterLikeness = config.characters?.likeness ?? 'independent'
 
 const script = buildMatchScript({
-  home: realMadrid,
-  away: barcelone,
-  competition: 'LaLiga',
+  home: france,
+  away: espagne,
+  competition: 'Ligue des Nations',
   seed: EXAMPLE_SEED,
 })
-const bible = buildMatchBible({ script, home: realMadrid, away: barcelone, world })
+const bible = buildMatchBible({ script, home: france, away: espagne, world })
 const prompts = buildAllPrompts(bible, script.shots, { characterLikeness })
 
 const lines: string[] = []
@@ -44,7 +44,7 @@ for (const p of prompts) {
 }
 const out = lines.join('\n')
 
-const outPath = resolve(here, '../examples/prompts.real-madrid-vs-barcelone.txt')
+const outPath = resolve(here, '../examples/prompts.france-vs-espagne.txt')
 mkdirSync(dirname(outPath), { recursive: true })
 writeFileSync(outPath, out + '\n', 'utf8')
 

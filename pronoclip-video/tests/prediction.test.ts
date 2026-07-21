@@ -139,3 +139,41 @@ describe('plafonds de réalisme', () => {
     expect(() => predictMatch(base({ score: { home: 0, away: 0 }, market: { result: 'home' } }))).toThrow()
   })
 })
+
+describe('non-joueurs jamais buteurs', () => {
+  it('un membre isPlayer:false (entraîneur) n’est jamais choisi comme buteur auto', () => {
+    const withCoach: PredictionInput = {
+      home: {
+        name: 'Bleus',
+        players: [
+          { name: 'Buteur', isKeyPlayer: true, profile: { position: 'FW' } },
+          { name: 'Le Coach', isPlayer: false }, // entraîneur : exclu du vivier
+        ],
+      },
+      away: AWAY,
+    }
+    for (let seed = 0; seed < 40; seed++) {
+      const p = predictMatch({ ...withCoach, score: { home: 2, away: 0 }, seed })
+      const homeScorers = p.goals.filter(g => g.teamSide === 'home').map(g => g.playerName)
+      expect(homeScorers).not.toContain('Le Coach')
+      expect(homeScorers.every(n => n === 'Buteur')).toBe(true)
+    }
+  })
+})
+
+describe('ordre des buteurs auto (joueur clé d’abord, gardien en dernier)', () => {
+  it('le joueur clé marque en premier, le gardien n’est jamais choisi dans un 2-0', () => {
+    const team: PredictionInput['home'] = {
+      name: 'Test',
+      players: [
+        { name: 'Le Gardien', profile: { position: 'GK' } },
+        { name: 'La Star', isKeyPlayer: true, profile: { position: 'FW' } },
+        { name: 'Le Milieu', profile: { position: 'MF' } },
+      ],
+    }
+    const p = predictMatch({ home: team, away: AWAY, score: { home: 2, away: 0 }, seed: 3 })
+    const homeScorers = p.goals.filter(g => g.teamSide === 'home').map(g => g.playerName)
+    expect(homeScorers[0]).toBe('La Star') // joueur clé d'abord (bug NaN corrigé)
+    expect(homeScorers).not.toContain('Le Gardien') // gardien relégué en fin de vivier
+  })
+})

@@ -12,7 +12,7 @@ import ffmpegPath from 'ffmpeg-static'
 import { buildMatchScript } from '../core/match-script'
 import { buildComposition } from '../core/composition'
 import { assertDisclosure, buildVideoMetadata } from '../core/render-guard'
-import { realMadrid, barcelone, EXAMPLE_SEED } from './example-teams'
+import { france, espagne, EXAMPLE_SEED } from './example-teams'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const out = resolve(here, '../pronoclip-output')
@@ -23,8 +23,10 @@ assertDisclosure(config)
 const metadata = buildVideoMetadata(config, config.image?.mode)
 console.log('Mention IA OK. Métadonnées :', metadata)
 
-// 2) Script + images (le 2-0 L0 déjà généré en B3, dans l'ordre des 8 plans).
-const script = buildMatchScript({ home: realMadrid, away: barcelone, competition: 'LaLiga', seed: EXAMPLE_SEED })
+// 2) Script + images (8 plans dans l'ordre). NB : cette liste d'images est l'ancien
+// jeu de démo Real 2-0 Barça (B3) ; pour un rendu France vs Espagne il faut regénérer
+// les 8 plans correspondants. Script/effectif = France vs Espagne (source de vérité).
+const script = buildMatchScript({ home: france, away: espagne, competition: 'Ligue des Nations', seed: EXAMPLE_SEED })
 const images = [
   'b3_plan1_team_reveal.jpg', 'b3_plan2_rival_reveal.jpg', 'b3_plan3_face_off.jpg',
   'b3_plan4_goal_mbappe.jpg', 'b3_plan5_goal_vinicius.jpg', 'b3_plan6_gk_save.jpg',
@@ -69,7 +71,7 @@ try {
 }
 
 // 5) Encodage MP4 (H.264, faststart) + métadonnées (mention IA + note B3).
-const mp4Path = resolve(out, 'pronoclip_real-madrid-vs-barcelone_B3.mp4')
+const mp4Path = resolve(out, 'pronoclip_france-vs-espagne_B3.mp4')
 const args = [
   '-y', '-framerate', String(FPS), '-i', resolve(framesDir, 'f_%04d.jpg'),
   '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart',

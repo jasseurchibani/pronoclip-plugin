@@ -1,1 +1,10 @@
 .hfbin/
+
+# Donnée client + artefacts runtime — JAMAIS versionnés (le repo est public).
+# Doublon défensif du .gitignore racine : si ce dossier devient un repo autonome,
+# la bibliothèque de portraits (donnée client) reste protégée.
+pronoclip-data/
+pronoclip-output/
+pronoclip-logs/
+.media/
+node_modules/

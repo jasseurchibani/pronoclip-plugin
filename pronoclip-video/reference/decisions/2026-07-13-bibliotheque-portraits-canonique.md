@@ -206,5 +206,89 @@ s'étend.
 
 ## 9. Liens
 `reference/specs/edit_image-mcp-rapidocms.md` (chemin critique),
+`reference/specs/pronoclip-squad-index.md` (schéma d'index implémenté),
 `2026-07-13-nom-reel-visage-fictif.md` (Option 5, visage désancré),
 `core/match-bible.ts` (`players[]` → à alimenter depuis l'index), MISSION §9 (revendabilité).
+
+---
+
+## 10. Question ouverte (2026-07-19) — un joueur, plusieurs équipes (À TRANCHER AVANT DE SEMER UNE 2e ÉQUIPE)
+
+**Statut : NON TRANCHÉ. Options posées, décision différée.**
+
+### 10.1 Le problème
+Le schéma actuel indexe les portraits **par équipe** :
+`pronoclip/<équipe>/portraits/<fichier>` + `index.json` par équipe. Or **un joueur
+appartient à plusieurs équipes** : Mbappé joue au **Real Madrid** (club) **et** en
+**équipe de France** (sélection). Si on le sème sous les deux, on génère **deux visages
+fictifs indépendants** → **deux « Mbappé » différents**, ce qui **casse frontalement le
+principe fondateur** de cet ADR (§2 : « un seul Mbappé fictif, partout, à l'identique »).
+
+Le symptôme n'existe pas encore (une seule équipe semée : France). Il **apparaît
+mécaniquement dès la 2e équipe** qui partage un joueur avec la 1re. D'où : trancher
+**avant** de semer une 2e équipe, pas après (re-semer casse les vidéos déjà produites).
+
+### 10.2 Tension de conception
+Le portrait gèle **deux choses de natures différentes** :
+- **l'identité du visage/gabarit** (carnation, coupe, morphologie) — qui doit être
+  **la même quelle que soit l'équipe** ;
+- **le kit** (couleurs du maillot) — qui **change** selon l'équipe (bleu France vs blanc Real).
+
+Aujourd'hui les deux sont fusionnés dans un seul PNG par (équipe, joueur). Séparer
+« qui est ce visage » de « quel maillot il porte » est le cœur de l'arbitrage.
+
+### 10.3 Options (non hiérarchisées, à départager)
+
+**Option A — Portrait indexé PAR JOUEUR (store player-centric).**
+Les portraits vivent dans un espace canonique **par joueur**
+(`pronoclip/players/<player_id>.png` + manifeste par joueur) ; chaque `index.json`
+d'équipe ne fait que **référencer** un `player_id`. Un visage, N équipes le pointent.
+- **+** Garantit « un seul visage canonique » par construction. C'est l'option qui
+  respecte le plus l'esprit de l'ADR.
+- **+** Semer une équipe qui partage des joueurs = **quasi gratuit** (on référence,
+  on ne régénère pas).
+- **−** Exige une **identité de joueur stable** (`player_id` + dédup des orthographes/
+  accents — cf. « Kylian Mbappe » vs « Mbappé »).
+- **−** Le portrait doit être **neutre en kit** (ou stocker des **variantes par kit**),
+  sinon le maillot d'une équipe fuite dans une autre. Le kit devient alors la
+  responsabilité du **kit bible** de l'équipe, appliqué au moment de l'`edit_image`.
+
+**Option B — Portraits par équipe MAIS clé d'identité partagée.**
+On garde le stockage par équipe (`pronoclip/<équipe>/…`) mais on ajoute un champ
+`player_id`/`canonical_ref` ; un résolveur **déduplique** et réutilise **le même asset
+de visage** même s'il est rangé sous un dossier d'équipe (référence/alias, pas copie).
+- **+** Migration **fine** depuis le schéma actuel (juste un champ + une indirection).
+- **−** Ambigu sur « qui détient le visage » : à quel dossier d'équipe appartient
+  l'asset partagé ? (Cf. Option D pour trancher ce point.)
+
+**Option C — Statu quo (par équipe, visages potentiellement divergents).**
+On accepte que Real-Mbappé et France-Mbappé **puissent différer** ; convention : ne
+semer un joueur **qu'une fois** et le référencer ailleurs à la main.
+- **+** Zéro changement de schéma, le moins cher **maintenant**.
+- **−** Repose sur de la **discipline manuelle** ; c'est précisément l'incohérence que
+  le §2 veut interdire. **Dette** qui grossit à chaque équipe partagée.
+
+**Option D — Équipe « domicile » canonique + alias.**
+Chaque joueur a **une** équipe/namespace « propriétaire » où son portrait vit
+physiquement ; les autres équipes **aliasent** vers elle (`portrait: "ref://pronoclip/
+players/mbappe"` ou pointeur inter-équipes).
+- **+** Réutilise le champ `portrait` **déjà explicite** (une valeur `ref://…` au lieu
+  d'un chemin) → indirection sans refonte du schéma.
+- **−** Choisir l'équipe propriétaire est arbitraire (club ? sélection ?) et fragile
+  aux **transferts** (le joueur change de club).
+
+### 10.4 Sous-questions transverses (valent pour A/B/D)
+1. **Identité de joueur** : schéma de `player_id` (slug stable ? id opaque ?) et
+   **normalisation des noms** (accents, prénom, alias « Manu Koné » vs « Kouadio Koné »).
+2. **Neutralité de kit** : portrait kit-neutre + kit peint à l'`edit_image`, **ou**
+   variantes de portrait par kit (club/sélection/extérieur) ?
+3. **Transferts & saisons** : quand un joueur change de club, le visage reste, le kit
+   change → versioning du kit **séparé** du versioning du visage.
+4. **Rétro-compat** : le champ `portrait` étant déjà explicite (chemin | URL | `null`),
+   ajouter une forme `ref://…` (Option A/D) n'impacte **pas** les fichiers existants.
+
+### 10.5 Recommandation de séquencement (pas une décision)
+Le champ `portrait` explicite introduit aujourd'hui **n'engage rien** : il accepte déjà
+chemin, URL ou `null`, et pourra demain accepter une **référence** (`ref://players/…`)
+sans migration. La décision A/B/C/D peut donc être prise **au moment de semer la 2e
+équipe**, sur un cas réel (le premier joueur partagé), sans bloquer le semis de France.

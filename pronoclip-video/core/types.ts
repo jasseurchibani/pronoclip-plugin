@@ -80,6 +80,12 @@ export interface Player {
   id?: string
   name: string
   isKeyPlayer?: boolean
+  /**
+   * `false` = personne de l'effectif qui n'est PAS un joueur de champ (entraîneur,
+   * staff) : présent pour son portrait mais JAMAIS choisi comme buteur par le moteur.
+   * Absent/`true` = joueur normal, éligible aux buts.
+   */
+  isPlayer?: boolean
   profile?: PlayerProfile
 }
 

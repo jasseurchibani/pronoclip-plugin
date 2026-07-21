@@ -189,9 +189,14 @@ function interleave(homeGoals: number, awayGoals: number): TeamSide[] {
   return seq
 }
 
-/** Effectif trié : joueur clé d'abord, puis ordre stable. */
-function keyFirst(players: Player[]): Player[] {
-  return [...players].sort((a, b) => Number(b.isKeyPlayer) - Number(a.isKeyPlayer))
+/**
+ * Effectif trié pour la sélection AUTO des buteurs : joueurs clés d'abord, gardiens en
+ * dernier (un GK ne marque quasiment jamais), sinon ordre stable de l'effectif.
+ * NB : comparateur booléen-sûr (`Number(undefined)` = NaN casserait le tri — bug corrigé).
+ */
+function scorerOrder(players: Player[]): Player[] {
+  const rank = (p: Player) => (p.isKeyPlayer ? 0 : 1) + (p.profile?.position === 'GK' ? 2 : 0)
+  return [...players].sort((a, b) => rank(a) - rank(b))
 }
 
 /**
@@ -272,8 +277,11 @@ export function predictMatch(input: PredictionInput): Prediction {
   // 3. L'effectif est une ENTRÉE, jamais une connaissance du modèle (cf. MISSION
   // correction §6). On refuse d'inventer des buteurs : si un but doit être attribué
   // automatiquement et que le camp concerné n'a pas d'effectif fourni → erreur.
-  const homePlayers = keyFirst(input.home.players)
-  const awayPlayers = keyFirst(input.away.players)
+  // Les non-joueurs (entraîneur, staff : `isPlayer === false`) ne sont JAMAIS choisis
+  // automatiquement comme buteurs — ils sont exclus du vivier de sélection.
+  const isFieldPlayer = (p: Player) => p.isPlayer !== false
+  const homePlayers = scorerOrder(input.home.players.filter(isFieldPlayer))
+  const awayPlayers = scorerOrder(input.away.players.filter(isFieldPlayer))
   const needsHomeScorer = slots.some(s => s.teamSide === 'home' && !s.playerName)
   const needsAwayScorer = slots.some(s => s.teamSide === 'away' && !s.playerName)
   if (needsHomeScorer && homePlayers.length === 0) {
