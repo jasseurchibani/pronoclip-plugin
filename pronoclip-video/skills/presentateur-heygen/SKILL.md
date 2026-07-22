@@ -117,6 +117,5 @@ Tous les appels portent l'en-tête `X-Api-Key: $HEYGEN_API_KEY`.
 
 - Champ `avatar_presentateur: true` dans `config.json` = intention, **pas**
   un blanc-seing : la confirmation du coût reste requise à chaque rendu.
-- Dans le studio cartoon : le clip présentateur s'insère en PiP dans la
-  scène d'ouverture ou de conclusion, posé par l'orchestrateur seulement
-  après le OUI humain (brief `premium: true`).
+- Le clip présentateur se livre tel quel, ou s'insère en **PiP** dans une composition
+  (scène d'ouverture/conclusion), posé seulement après le OUI humain sur le coût.

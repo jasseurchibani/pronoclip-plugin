@@ -1,21 +1,20 @@
 ---
-description: Génère UNE vidéo de pronostic score exact (rendu local HyperFrames)
-argument-hint: "<équipe domicile> <équipe extérieur> <score> [style] [--light]"
+description: Génère UNE vidéo de pronostic score exact (~40 s, rendu local gratuit)
+argument-hint: "<équipe domicile> <équipe extérieur> [score] [compétition]"
 ---
 
-Génère une vidéo de pronostic PronoClip pour un match unique.
+Génère une vidéo de pronostic PronoClip pour un match unique (9:16, ~40 s).
 
 Arguments reçus : $ARGUMENTS
 
-1. Parser les arguments : équipe domicile, équipe extérieur, score
-   pronostiqué (ex. `2-1`), puis optionnellement le style
-   (`réaliste-stylisé` | `cartoon` | `néon` | `rétro`) et le flag `--light`.
-2. Invoquer le skill **`video-pronostic`** avec ces entrées. Le skill
-   vérifie les entrées obligatoires manquantes (compétition, date/heure du
-   match…) et les demande avant de générer — ne rien inventer.
-3. Si `--light` est présent : mode léger (template texte + formes, sans
-   `sequences-match` ni `audio-narration`).
+1. Parser : équipe domicile, équipe extérieur, puis optionnellement le score
+   (`2-0` → L1 ; absent → **L0**, le moteur prédit le score) et la compétition.
+2. Invoquer le skill **`video-pronostic`** et suivre son pipeline (predict →
+   match-script → composition → rendu local → voix off + audio). Il demande les
+   entrées obligatoires manquantes (compétition, date/heure) — ne rien inventer.
+3. Rendu **local et gratuit** par défaut (tier `motion`, Chrome + ffmpeg). Le tier
+   `animated` (Kling, payant) et la voix `elevenlabs` sont **opt-in explicites**.
 
-Tout le workflow (références légales, composition, contrôles, rendu local,
-log) est défini dans le skill `video-pronostic` — le suivre intégralement,
-garde-fous compris.
+Démo immédiate sans argument ni config : `npm run render` produit le MP4 France vs
+Espagne. Garde-fous (zéro logo/visage, mention IA, jamais le MCP payant `render_video`)
+dans le skill `video-pronostic` — les suivre intégralement.

@@ -3,8 +3,8 @@ name: verificateur-legal
 description: >-
   Modération finale d'une vidéo PronoClip rendue : extrait des frames du MP4
   et vérifie de façon adversariale les directives légales (zéro logo, zéro
-  visage/joueur identifiable, mention IA visible en permanence). Dernier
-  maillon de l'équipe studio-cartoon — rien ne se publie sans son verdict.
+  visage/joueur identifiable, mention IA visible en permanence). Barrière de
+  modération finale — rien ne se publie sans son verdict OK.
 tools: Bash, Read
 ---
 

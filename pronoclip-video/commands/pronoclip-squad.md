@@ -38,10 +38,12 @@ clients. C'est le moat du projet.
    - ne rien générer sans ce OUI.
 4. **Revue humaine** : présenter chaque portrait, laisser **valider / refuser /
    régénérer**. Un portrait refusé n'est jamais gelé.
-5. **Geler** : écrire l'entrée dans l'index `./pronoclip-data/squads/<namespace>/<équipe>.json`
-   (`portrait_url`, `descriptor`, `seed`, `version`, `status: "frozen"`), et déposer
-   l'image dans la bibliothèque d'assets. Une correction crée une **nouvelle version** ;
-   le pointeur canonique ne bouge qu'après validation.
+5. **Geler** : écrire l'entrée dans `./pronoclip-data/squads/<namespace>/<team_code>/index.json`
+   (schéma **`pronoclip.squad/v1`** — cf. `reference/specs/pronoclip-squad-index.md` et
+   `adapters/squad-library.ts`) : `name`, `position`, `profile` (heading/longRange/setPieces/
+   isPenaltyTaker), et **`portrait` = chemin EXPLICITE** vers `portraits/<fichier>.png`
+   (jamais dérivé du nom). Déposer le PNG dans `portraits/`. Une correction = nouvelle
+   version ; le pointeur canonique ne bouge qu'après validation.
 
 ## Garde-fous
 
@@ -51,7 +53,9 @@ clients. C'est le moat du projet.
 - Si une vidéo demande un joueur non semé → **erreur dure « effectif non semé »**,
   jamais de génération silencieuse (barrière côté lecture, `core/portrait-index.ts`).
 
-> État : squelette posé (résolveur, index, erreur « non semé » — `core/portrait-index.ts`).
+> État : résolveur + index implémentés (`adapters/squad-library.ts`, erreur « non semé » /
+> « portrait non généré » ; `core/portrait-index.ts` pour le repli namespace). **France est
+> semée** (27 portraits déjà fournis, en kit, dans `pronoclip-data/squads/pronoclip/france/`).
 > L'étape de **génération** (3) reste inactive tant que l'outil serveur `edit_image`
-> (`reference/specs/edit_image-mcp-rapidocms.md`) et la validation juridique de
-> l'Option 5 ne sont pas livrés.
+> (`reference/specs/edit_image-mcp-rapidocms.md`) et la validation juridique de l'Option 5
+> ne sont pas livrés — d'ici là, semer = déposer des portraits + renseigner `index.json`.

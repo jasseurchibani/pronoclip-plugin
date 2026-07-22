@@ -70,6 +70,13 @@ opérations — toujours passer par les IDs mémorisés dans `config.json` :
 
 ## Partie B — Daily
 
+> ⚠️ **Contrainte serveur (vérifiée en réel)** : `create-daily-tool` est **réservé aux
+> comptes MEMBRE** — « les owners ne créent pas de dailies ». Sur un compte **owner**
+> (ex. la société propriétaire), `get-dailies-tool` renvoie *tous* les dailies de la
+> company mais la **création échoue**. Sur owner : produire le résumé agrégé et le
+> présenter/loguer, sans appeler `create-daily-tool`. Le daily se crée depuis un compte
+> membre de l'équipe.
+
 1. **Lire** le log du jour : `./pronoclip-logs/YYYY-MM-DD.md`.
    - **Si aucun log aujourd'hui : le dire à l'utilisateur et ne RIEN créer.**
 2. **Agréger** :

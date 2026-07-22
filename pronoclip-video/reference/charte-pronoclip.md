@@ -63,11 +63,14 @@ quoi ? 🔥
 Pronostic — contenu généré par IA
 ```
 
-## Variables CSS par style (pour `template-composition.html`)
+## Variables CSS par style (thèmes — référence)
 
-À injecter dans le `:root` du template — les couleurs d'équipes
-(`--color-home`, `--color-away` et leurs accents) restent toujours celles
-du match, seul le thème change.
+> Réservoir de thèmes pour le futur knob `style` de `core/composition.ts`. La
+> composition actuelle applique la charte de marque de `pronoclip.config.json`
+> (fond `#0A0A0A`, accent `#33D17A`). Le thème **cartoon** ci-dessous est l'endroit où le
+> style dessin animé reviendra (comme thème, pas comme studio parallèle — cf. Phase 4).
+> Les couleurs d'équipes (`--color-home`, `--color-away`) restent toujours celles du
+> match ; seul le thème change.
 
 ```css
 /* ---- néon (DÉFAUT — cœur de l'identité PronoClip) ---- */

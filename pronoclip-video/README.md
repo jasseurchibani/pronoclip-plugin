@@ -4,9 +4,12 @@ Plugin Claude Code pour la génération de **vidéos de pronostics football (sco
 rendu vidéo en local avec **HyperFrames**, planification des routines par **journée de matchs**
 via **RapidoRH**, publication via **RapidoCMS**, et transformation des logs d'exécution en **dailies**.
 
-> Version 0.4.0 — plugin fonctionnellement complet (5 commandes, 8 skills
-> dont le présentateur animé HeyGen, 4 agents dont l'équipe studio-cartoon,
-> 6 références). Passage en 1.0.0 après validation de la section « Recette ».
+> Version 0.5.0-dev — cœur porté (`core/` + `adapters/` + `scripts/`), pipeline vidéo
+> **local et gratuit opérationnel** (rendu 40 s avec voix off + audio). **5 commandes,
+> 6 skills, 2 agents, 3 références** — la branche cartoon (studio + 2 agents) et
+> `sequences-match` ont été retirées en Phase 4 (mécanique pré-core ; le style cartoon
+> reviendra comme *thème* dans `core/composition`, pas comme studio parallèle).
+> **Usage à jour de bout en bout : voir `USAGE.md`.**
 
 ---
 
@@ -72,34 +75,16 @@ Par défaut, toutes les routines par journée de matchs utilisent le rendu local
 |---|---|---|---|
 | `/pronoclip-match` | Act | `video-pronostic` | Génère UNE vidéo de pronostic (score exact) : composition HTML/GSAP puis rendu **local** via le CLI HyperFrames. Ex. : `/pronoclip-match PSG Real 2-1 néon`. |
 | `/pronoclip-routine` | Sense → Report | `routine-matchs` | Traite une journée complète : détection des matchs, tâches RapidoRH, validation GO, compositions en parallèle (`video-composer`), publication CMS, log. Ex. : `/pronoclip-routine demain`. |
-| `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). |
-| `/pronoclip-cartoon` | Act | `studio-cartoon` | Version **dessin animé** d'un match ou de la journée : équipe d'agents scénariste → directeur artistique → compositeur → vérificateur légal. Ex. : `/pronoclip-cartoon PSG Real 2-1` ou `/pronoclip-cartoon demain`. |
-| `/pronoclip-presentateur` | Act | `presentateur-heygen` | **Présentateur cartoon animé qui parle** (HeyGen Talking Photo), voix FR. **PAYANT** (~1 crédit/s), opt-in avec confirmation du coût. |
+| `/pronoclip-daily` | Report | `suivi-rh-daily` | Transforme le log du jour en daily RapidoRH (unique, heures agrégées). ⚠️ Création réservée aux comptes **membre** (pas l'owner). |
+| `/pronoclip-presentateur` | Act | `presentateur-heygen` | **Présentateur animé qui parle** (HeyGen Talking Photo), voix FR. **PAYANT** (~1 crédit/s), opt-in avec confirmation du coût. |
 
-## Équipe d'agents — studio cartoon
+## Agents (2)
 
-Pour les vidéos en version dessin animé, le plugin dispatche une équipe de
-4 agents spécialisés (un studio par match, max 2 studios en parallèle) :
-
-```
-match + prono
-     │
-     ▼
-scenariste-cartoon ──────► storyboard JSON (4-6 scènes, gags,
-     │                     personnages ORIGINAUX type mascotte)
-     ▼
-directeur-artistique-cartoon ──► plans images cartoon cohérents
-     │                           (generate_image RapidoCMS + QC, gelés)
-     ▼
-video-composer ──────────► MP4 rendu en LOCAL (thème cartoon,
-     │                     bounce / squash & stretch / wipes)
-     ▼
-verificateur-legal ──────► verdict OK / REJET (modération bloquante :
-                           logos, joueurs identifiables, mention IA)
-```
-
-Chaque maillon a un contrat de sortie JSON strict (voir `agents/`) ; un
-REJET du vérificateur bloque la publication (max 2 cycles de correction).
+- **`video-composer`** — rend UNE vidéo par match (parallélisable, max 3 en routine),
+  wrapper du pipeline local (`scripts/render-video.ts`). Contrat de sortie JSON.
+- **`verificateur-legal`** — modération **adversariale** des frames d'un MP4 rendu
+  (zéro logo/visage/mention IA absente) ; verdict OK/REJET **bloquant**. Complète le
+  hook `assertDisclosure` (qui, lui, ne vérifie que la config).
 
 
 ## Configuration
@@ -199,44 +184,33 @@ Tests de recette à dérouler avant toute mise en production chez un client :
 | 6 | Même commande avec `tts_provider: "elevenlabs"` en config | Voix **ElevenLabs** utilisée (`elevenlabs_voice_id` de la config) ; le **nombre de caractères envoyés est loggé**. |
 | 7 | `/pronoclip-routine demain` avec `mode_routine: "light"` | Vidéos **sans images ni audio** (template texte + formes) ; temps de production nettement réduit. |
 | 8 | Demande « ajoute un présentateur » | **Annonce du coût HeyGen** puis **attente d'une confirmation explicite** avant tout appel API ; aucun appel sans OUI. |
-| 9 | Image générée avec un logo visible | **Retry automatique** avec negative renforcé (max 2), puis **fallback dégradé charte** ; l'incident est loggé. |
-| 10 | `/pronoclip-cartoon PSG Real 2-1` | Storyboard 4–6 scènes validé (personnages originaux) ; plans cartoon **cohérents entre eux** (même style, mêmes mascottes) ; MP4 12–15 s rendu localement ; **verdict `verificateur-legal` OK** avant tout usage. |
-| 11 | Storyboard contenant une caricature de joueur réel | **REJET** par la chaîne (scénariste redispatché ou verdict légal négatif) ; jamais de rendu publié ; l'incident est loggé. |
+| 9 | MP4 rendu passé à `verificateur-legal` | Frames extraites + inspectées : **verdict OK** si zéro logo/écusson/visage identifiable et mention IA présente sur toutes les frames ; **REJET** sinon (bloque la publication). |
 
 ## Structure du plugin
 
 ```
 pronoclip-video/
-├── .claude-plugin/
-│   └── plugin.json                    # Manifeste du plugin
-├── commands/
-│   ├── pronoclip-match.md             # /pronoclip-match → skill video-pronostic
-│   ├── pronoclip-routine.md           # /pronoclip-routine → skill routine-matchs
-│   ├── pronoclip-daily.md             # /pronoclip-daily → skill suivi-rh-daily (B)
-│   ├── pronoclip-cartoon.md           # /pronoclip-cartoon → skill studio-cartoon
-│   └── pronoclip-presentateur.md      # /pronoclip-presentateur → skill presentateur-heygen
-├── skills/
-│   ├── video-pronostic/SKILL.md       # Une vidéo : brief → composition → rendu local
-│   ├── routine-matchs/SKILL.md        # Journée complète (LOOP ENGINE, onboarding CONFIG)
-│   ├── studio-cartoon/SKILL.md        # Équipe d'agents : version dessin animé d'un match
-│   ├── presentateur-heygen/SKILL.md   # Présentateur cartoon animé qui parle (HeyGen, payant)
-│   ├── publication-cms/SKILL.md       # Upload, brouillon, planification, campagne
-│   ├── audio-narration/SKILL.md       # Voix off TTS, BGM, SFX, captions karaoké
-│   ├── sequences-match/SKILL.md       # Images RapidoCMS → mini-séquences animées
-│   └── suivi-rh-daily/SKILL.md        # Kanban RapidoRH + dailies
-├── agents/
-│   ├── video-composer.md              # Composition + rendu local (parallélisable, max 3)
-│   ├── scenariste-cartoon.md          # Storyboard cartoon (scènes, gags, mascottes)
-│   ├── directeur-artistique-cartoon.md# Plans images cohérents (RapidoCMS + QC)
-│   └── verificateur-legal.md          # Modération finale adversariale (bloquante)
-├── reference/
-│   ├── charte-pronoclip.md            # Identité visuelle/éditoriale, captions, thèmes CSS
-│   ├── directives-legales.md          # 3 règles bloquantes
-│   ├── prompts-sequences.md           # Prompts generate_image des 5 plans de match
-│   ├── scripts-narration.md           # Gabarits de VO (hype/analyse/humour × FR/EN)
-│   ├── storyboard-cartoon.md          # Trames cartoon, style, character design, recettes
-│   └── template-composition.html      # Squelette 4 scènes (GSAP)
-└── README.md
+├── .claude-plugin/plugin.json         # Manifeste du plugin
+├── core/                              # Cœur PUR (aucune I/O, aucun MCP) — testé (vitest)
+│   ├── prediction.ts  match-script.ts  shot-budget.ts  match-bible.ts
+│   ├── composition.ts (HTML→overlays) narration.ts  labels.ts  render-guard.ts
+│   ├── prompt-builder.ts video-prompt.ts scene-*.ts portrait-index.ts  types.ts  rng.ts
+├── adapters/                          # Frontière I/O — transport injecté, MCP jamais appelé ici
+│   ├── tts.ts (SAPI/ElevenLabs)  audio-mux.ts (musique+whoosh+mux)
+│   ├── openai-image.ts (B2)  fal.ts (Kling)  squad-library.ts (portraits)
+│   ├── rapidocms.ts (publication)  mcp.ts  rest.ts
+├── scripts/                           # Drivers exécutables (tsx)
+│   ├── render-video.ts (npm run render)  publish-video.ts  animate-shot.ts
+│   ├── example-teams.ts  generate-example.ts  tunnel.mjs (upload éphémère)
+├── commands/    (5)  match · routine · daily · presentateur · squad
+├── skills/      (6)  video-pronostic · routine-matchs · publication-cms
+│                     audio-narration · suivi-rh-daily · presentateur-heygen
+├── agents/      (2)  video-composer · verificateur-legal
+├── reference/   (3)  charte-pronoclip.md · directives-legales.md · scripts-narration.md
+│   ├── decisions/    ADR (portraits, nom/visage, recette clip animé)
+│   └── specs/        edit_image, hyperframes-pipeline, squad-index, backend-asks
+├── pronoclip.config.json  .env.example  package.json
+└── README.md  USAGE.md
 ```
 
 ## Enregistrement dans le marketplace

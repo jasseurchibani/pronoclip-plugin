@@ -2,125 +2,65 @@
 name: audio-narration
 description: >-
   Utiliser quand une vidéo de pronostic doit avoir une voix off, une
-  narration, un commentaire de match, de la musique de fond ou des
-  sous-titres synchronisés. Déclencher aussi sur "ajoute une voix",
-  "commentateur", "narration", "musique", "captions".
+  narration, un commentaire de match, de la musique de fond ou des SFX.
+  Déclencher aussi sur "ajoute une voix", "commentateur", "narration",
+  "musique", "whoosh".
 ---
 
-# Audio & narration — voix off, musique et captions PronoClip
+# Audio & narration — voix off, lit musical et SFX PronoClip
 
-Ajoute la couche audio d'une vidéo de pronostic : script de commentateur,
-voix off TTS, musique de fond, SFX et captions karaoké synchronisées.
-S'applique sur une composition produite par `video-pronostic` ou
-`video-composer`. Lire la section **Garde-fous** avant toute génération.
+Ajoute la couche audio d'une vidéo de pronostic. **Le pipeline est CODÉ** — ce skill
+l'orchestre, il ne réimplémente rien :
 
-## Étape 0 — Références
+| Étape | Module | Rôle |
+|---|---|---|
+| Script | `core/narration.ts` (`buildNarration`) | commentateur FR dérivé du MatchScript, tag IA obligatoire |
+| Voix off | `adapters/tts.ts` (`synthesizeVoice`) | cascade TTS (gratuit défaut / ElevenLabs opt-in) |
+| Lit musical + SFX + mux | `adapters/audio-mux.ts` | musique GÉNÉRÉE + whoosh aux coupes, mux ffmpeg |
 
-1. **Invoquer** les skills :
-   - `/hyperframes-media` — préprocessing TTS / BGM / transcription ;
-   - `/media-use` — résolution et **gel des assets** dans `.media/` avec
-     manifest.
-2. **Vérifier l'installation** ; si absents :
-
-   ```bash
-   npx skills add heygen-com/hyperframes --full-depth
-   ```
-
-   **TOUJOURS `--full-depth`** : sans lui, `skills add` récupère un blob en
-   retard sur `main`.
-3. **Charger** :
-   - `${CLAUDE_PLUGIN_ROOT}/reference/scripts-narration.md` — gabarits de
-     scripts ;
-   - `${CLAUDE_PLUGIN_ROOT}/reference/charte-pronoclip.md` — ton et style.
+Tout est déjà branché dans `scripts/render-video.ts` (`npm run render`). Lire la section
+**Garde-fous** avant toute génération payante.
 
 ## Étape 1 — Script de narration
 
-- Générer un script **calibré sur la durée de la vidéo** (~2,5 mots/s ;
-  12 s ≈ 30 mots), structuré sur les 4 scènes :
+`buildNarration(script)` produit : hook → annonce du match → une ligne par but (ordre
+chrono) → score final → **tag de transparence IA** (« Pronostic généré par intelligence
+artificielle. »). Calibré ~2,5 mots/s. Ton commentateur énergique (charte). Pour varier le
+registre (hype / analyse / humour), s'inspirer de `reference/scripts-narration.md`.
 
-  | Beat | Fenêtre | Rôle |
-  |---|---|---|
-  | hook | 0–2 s | accroche |
-  | annonce | 2–5 s | annonce du match |
-  | tension | 5–9 s | montée de tension sur le score |
-  | punchline | 9–12 s | punchline + CTA |
+## Étape 2 — Voix off (cascade ÉCONOMIQUE)
 
-- **Ton** : commentateur sportif énergique, complice. **Français par
-  défaut** — lire `langue_narration` dans `./pronoclip-data/config.json`.
-- Partir des **gabarits** de `reference/scripts-narration.md` : 3 registres
-  (hype, analyse froide, humour — registre par défaut : `narration_style`
-  de `config.json`) × FR/EN, variables `{home}` `{away}` `{score}`
-  `{pseudo}`.
-- **Toujours** inclure la transparence « pronostic généré par IA » —
-  oralement (tag de fin de script) ou visuellement (mention à l'écran du
-  template, déjà obligatoire).
-
-## Étape 2 — Sélection du provider TTS (cascade économique)
+`resolveTtsProvider` — **jamais de bascule silencieuse vers le payant** :
 
 | Priorité | Provider | Condition | Coût |
 |---|---|---|---|
-| 1 | **Kokoro** | défaut — c'est LE provider des routines automatisées | gratuit, local, aucune clé |
-| 2 | **ElevenLabs** | `ELEVENLABS_API_KEY` présent dans l'environnement **ET** (l'utilisateur demande « voix premium » **OU** `config.json` a `tts_provider: "elevenlabs"`) | payant au caractère |
-| 3 | **HeyGen Starfish** | utilisateur connecté (`npx hyperframes auth`) **ET** demande explicite | compte HeyGen |
+| 1 | **SAPI** (fr-FR local, voix Hortense) | défaut | **gratuit, aucune clé** |
+| 1bis | **Kokoro** (`hyperframes tts`) | quand le CLI HyperFrames est installé | gratuit, local |
+| 2 | **ElevenLabs** | opt-in : `--voice=elevenlabs` (ou `tts_provider` en config) **ET** `ELEVENLABS_API_KEY` présent | payant au caractère |
 
-- Pour ElevenLabs : **figer la voix par défaut dans `config.json`**
-  (`elevenlabs_voice_id`) pour une identité sonore constante ; **logger le
-  nombre de caractères envoyés** à chaque appel (API payante au caractère).
-  La clé `ELEVENLABS_API_KEY` vit dans l'environnement, **jamais dans
-  `config.json`**.
-- **La routine ne DOIT JAMAIS basculer silencieusement sur un provider
-  payant** : Kokoro par défaut ; payant = choix explicite dans
-  `config.json` ou en session.
+- **Logger le nombre de caractères** envoyés à un provider payant (fait par `tts.ts`).
+- La clé `ELEVENLABS_API_KEY` vit dans l'environnement, **jamais dans un fichier versionné**.
 
-## Étape 3 — Génération
+## Étape 3 — Lit musical + SFX + mix
 
-1. **Voix off** :
+`audio-mux.ts` génère (aucune track commerciale — musique **générée** uniquement) :
+- **lit musical** : triade adoucie, fondu in/out, sur toute la durée ;
+- **whoosh** : rafale de bruit filtrée, placée à **chaque coupe** de plan.
 
-   ```bash
-   npx hyperframes tts   # avec le provider choisi à l'étape 2
-   ```
+**Mixage** : voix ≈ 0 dB, lit musical **ducké ≈ −16 dB** sous la voix, whoosh moyen — la
+voix domine toujours. Mux dans la vidéo muette via ffmpeg-static → flux AAC.
 
-   → WAV dans `.media/vo/`, **un fichier par beat** (pattern per-beat VO
-   des launch videos HyperFrames), nommage `{scene}_{n}.wav`.
+## Étape 4 — Log
 
-2. **Musique de fond** — selon `bgm_provider` de `config.json` :
-   - `musicgen` / `lyria` : `npx hyperframes bgm` avec le mood
-     `"stadium energy, driving percussion, rising tension"` pour le
-     registre hype ;
-   - `catalogue` : via `/media-use`.
+Append dans `./pronoclip-logs/YYYY-MM-DD.md` :
 
-   **Règle de mixage** : BGM ducké sous la VO — **VO à −3 dB, BGM à
-   −14 dB sous la voix**.
-
-3. **SFX optionnels** via `/media-use` : clameur de stade (intro), coup de
-   sifflet (annonce), impact sur la révélation du score.
-
-## Étape 4 — Captions
-
-- **Transcrire la VO** (Whisper, timestamps **mot à mot**).
-- Poser des **captions karaoké** stylées charte PronoClip — technique
-  `slam` ou `karaoke` des references *dynamic-techniques* de
-  `/hyperframes`.
-- **Obligatoire en 9:16** : TikTok/Reels se consomment sans le son.
-
-## Étape 5 — Intégration + log
-
-1. Câbler les `<audio>` dans la composition — **playback géré par le
-   framework, jamais en autoplay manuel**.
-2. Re-passer `npx hyperframes lint` **et** `npx hyperframes validate`.
-3. Logger dans `./pronoclip-logs/YYYY-MM-DD.md` :
-
-   ```markdown
-   - [HH:MM] Audio : VO {provider} ({n} caractères), BGM {source}, captions OK — ~Xmin
-   ```
+```markdown
+- [HH:MM] Audio : VO {provider} ({n} caractères), lit musical + {n} whoosh, mux OK — ~Xmin
+```
 
 ## Garde-fous
 
-- **Musique** : uniquement générée (Lyria/MusicGen) ou issue du catalogue
-  HeyGen / d'une licence libre **documentée dans le manifest `.media/`** —
-  **jamais de track commerciale**.
-- **Kokoro par défaut en routine** ; ElevenLabs / HeyGen Starfish =
-  **opt-in explicite** (config ou session), jamais de bascule silencieuse
-  vers du payant.
-- `npx hyperframes lint` **ET** `npx hyperframes validate` doivent passer
-  **tous les deux** avant tout rendu.
+- **Musique GÉNÉRÉE** uniquement (jamais de track commerciale).
+- **Gratuit par défaut** (SAPI/Kokoro) ; ElevenLabs / HeyGen = **opt-in explicite**, jamais
+  de bascule silencieuse vers du payant.
+- La **transparence IA** est toujours dans la narration (tag oral) EN PLUS du filigrane/carton.

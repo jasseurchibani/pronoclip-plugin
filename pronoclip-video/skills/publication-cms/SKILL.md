@@ -11,6 +11,11 @@ Publie une vidéo de pronostic sur les réseaux sociaux avec le MCP
 **RapidoCMS** : upload du média, brouillon au ton PronoClip, planification
 avant le coup d'envoi, rattachement à la campagne de la compétition.
 
+> **Implémentation** : `adapters/rapidocms.ts` (contrat `PublishTransport` INJECTÉ +
+> `buildCaption` mention IA + `makePublisher` orchestration) et `scripts/publish-video.ts`
+> (construit le plan). **Le code n'appelle jamais le MCP** — en Claude Code, l'AGENT est le
+> transport (il appelle `upload_file_tool` / `create_draft_tool` / `schedule_draft_tool`).
+
 ## CONFIG (centralisée — plugin revendable)
 
 Tout ce qui change d'un client à l'autre vient de
@@ -34,14 +39,19 @@ Si `config.json` n'existe pas encore (skill invoqué hors routine) : appeler
 ⚠️ `upload_file_tool` exige une **URL PUBLIQUE** — impossible de lui passer
 un binaire local. Deux chemins selon l'origine du MP4 :
 
-**a) MP4 rendu localement** (cas normal, CLI HyperFrames) :
+**a) MP4 rendu localement** (cas normal) :
 
-1. Exposer d'abord le fichier via une URL publique — bucket S3/objet du
-   projet, ou le stockage média BraindCode ;
+1. Exposer d'abord le fichier via une URL publique. Trois chemins (cf. décision Phase 3) :
+   - **S3/CDN propriétaire** (`cdn.pronoclip.app`) — durable, recommandé prod ;
+   - **tunnel éphémère** `node scripts/tunnel.mjs pronoclip-output 8787 <cloudflared>` →
+     URL `trycloudflare.com` (validé) — RapidoCMS fetch UNE fois puis **re-héberge dans son
+     S3** (l'URL n'a besoin de vivre que le temps du fetch) ;
+   - (à terme) un outil MCP d'**upload d'octets** côté RapidoCMS supprimerait ce trou.
 2. puis :
 
    ```
-   upload_file_tool(type: "video", file_url: <url publique>)
+   upload_file_tool(type: "video", name: "<nom.mp4>", file_url: <url publique>)
+   → renvoie l'URL S3 biblio (media_url du brouillon)
    ```
 
 **b) MP4 issu du MCP HyperFrames** (rendu cloud, cas premium) :
@@ -77,7 +87,9 @@ Pronostic — contenu généré par IA
 `schedule_draft_tool` avec :
 
 - `post_heure` **STRICTEMENT au format `HH:MM:SS`** (les deux-points sont
-  obligatoires — `18:30:00`, jamais `18h30` ni `1830`) ;
+  obligatoires — `18:30:00`, jamais `18h30` ni `1830`). ⚠️ Le **schéma MCP annonce
+  `H-i-s` à tort** (tirets) — le serveur exige les deux-points. Quirk observé : `18:00:00`
+  envoyé → **`18:10`** stocké (léger décalage serveur, à surveiller ; cf. spec backend) ;
 - **Règle métier** : publier entre **H-6 et H-2** avant le coup d'envoi.
   - kickoff 21:00 → créneau valide entre 15:00:00 et 19:00:00 ;
   - si la fenêtre est déjà dépassée (moins de 2 h avant le match), **ne pas
