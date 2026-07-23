@@ -81,10 +81,14 @@ export interface MuxLevels {
   sfx: number   // ex. 0.5
 }
 
-/** Mux final : vidéo muette + voix + lit musical + SFX → MP4 (H.264 copié, AAC). */
+/**
+ * Mux final : vidéo muette + (voix optionnelle) + lit musical + SFX → MP4 (H.264 copié, AAC).
+ * `voice: null` → mux sans voix (lit musical + whoosh seuls) : dégradation propre quand la
+ * TTS locale est indisponible (démo portable), sans jamais bloquer la production du MP4.
+ */
 export function muxAudio(params: {
   videoSilent: string
-  voice: string
+  voice: string | null
   music: string
   sfx: string
   out: string
@@ -94,25 +98,28 @@ export function muxAudio(params: {
 }): string {
   const { videoSilent, voice, music, sfx, out, levels, metadata } = params
   const log = params.log ?? (() => {})
-  const filter =
-    `[1:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${levels.voice}[vo];` +
-    `[2:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${levels.music}[bg];` +
-    `[3:a]aformat=sample_rates=44100:channel_layouts=stereo,volume=${levels.sfx}[fx];` +
-    `[vo][bg][fx]amix=inputs=3:duration=longest:normalize=0[a]`
-  const args = [
-    '-y',
-    '-i', videoSilent,
-    '-i', voice,
-    '-i', music,
-    '-i', sfx,
-    '-filter_complex', filter,
-    '-map', '0:v', '-map', '[a]',
-    '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k',
-    '-movflags', '+faststart', '-shortest',
-  ]
+  const af = 'aformat=sample_rates=44100:channel_layouts=stereo'
+  const args = ['-y', '-i', videoSilent]
+  let filter: string
+  if (voice) {
+    args.push('-i', voice, '-i', music, '-i', sfx)
+    filter =
+      `[1:a]${af},volume=${levels.voice}[vo];` +
+      `[2:a]${af},volume=${levels.music}[bg];` +
+      `[3:a]${af},volume=${levels.sfx}[fx];` +
+      `[vo][bg][fx]amix=inputs=3:duration=longest:normalize=0[a]`
+  } else {
+    args.push('-i', music, '-i', sfx)
+    filter =
+      `[1:a]${af},volume=${levels.music}[bg];` +
+      `[2:a]${af},volume=${levels.sfx}[fx];` +
+      `[bg][fx]amix=inputs=2:duration=longest:normalize=0[a]`
+  }
+  args.push('-filter_complex', filter, '-map', '0:v', '-map', '[a]',
+    '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-movflags', '+faststart', '-shortest')
   if (metadata) args.push('-metadata', `comment=${metadata}`, '-metadata', `description=${metadata}`)
   args.push(out)
   run(args, 'mux')
-  log(`Mux audio → ${out}`)
+  log(`Mux audio → ${out}${voice ? '' : ' (sans voix — dégradation propre)'}`)
   return out
 }

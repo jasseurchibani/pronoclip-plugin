@@ -7,18 +7,16 @@
 // Voix : GRATUITE par défaut (SAPI fr-FR local) ; --voice=elevenlabs = opt-in payant.
 
 import 'dotenv/config' // charge .env (ELEVENLABS_API_KEY pour la voix premium opt-in)
-import { readFileSync, writeFileSync, mkdirSync, rmSync, readdirSync, existsSync } from 'node:fs'
+import { readFileSync, mkdirSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { spawnSync } from 'node:child_process'
-import puppeteer from 'puppeteer-core'
-import ffmpegPath from 'ffmpeg-static'
 import { buildMatchScript } from '../core/match-script'
 import { buildComposition } from '../core/composition'
 import { buildNarration } from '../core/narration'
 import { assertDisclosure, buildVideoMetadata } from '../core/render-guard'
 import { synthesizeVoice, type TtsProvider } from '../adapters/tts'
 import { synthMusicBed, synthWhoosh, buildSfxTrack, muxAudio } from '../adapters/audio-mux'
+import { renderHtmlToSilentMp4, writeCompositionHtml } from '../adapters/local-render'
 import { france, espagne, EXAMPLE_SEED } from './example-teams'
 
 const here = dirname(fileURLToPath(import.meta.url))
@@ -45,59 +43,15 @@ const images = useImages
     ]
   : script.shots.map(() => '') // '' → panneau généré
 
-// 4) Composition HTML (self-contained).
+// 4) Composition HTML + rendu local → MP4 muet (Chrome + ffmpeg, adaptateur partagé).
 const body = buildComposition({ script, images, config })
-const html = `<!doctype html><html><head><meta charset="utf-8">
-<style>html,body{margin:0;background:${config.brand.colors.background};}</style></head>
-<body>${body}</body></html>`
-const htmlPath = resolve(out, 'preview.html')
-writeFileSync(htmlPath, html, 'utf8')
+const htmlPath = writeCompositionHtml(resolve(out, 'preview.html'), body, config.brand.colors.background)
 console.log('Composition écrite :', htmlPath)
-
-// 5) Capture déterministe (Chrome headless) → frames → vidéo MUETTE (ffmpeg-static).
-function findChrome(): string {
-  const candidates = [
-    'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-    process.env.CHROME_PATH || '',
-  ]
-  const found = candidates.find(p => p && existsSync(p))
-  if (!found) throw new Error('Chrome introuvable. Installe Chrome ou définis CHROME_PATH.')
-  return found
-}
-const FPS = 12
-const W = 720, H = 1280
-const framesDir = resolve(out, '.frames')
-rmSync(framesDir, { recursive: true, force: true })
-mkdirSync(framesDir, { recursive: true })
-
-let totalMs = 0
-const browser = await puppeteer.launch({ executablePath: findChrome(), headless: true, args: ['--no-sandbox', '--force-color-profile=srgb'] })
-try {
-  const page = await browser.newPage()
-  await page.setViewport({ width: W, height: H, deviceScaleFactor: 1 })
-  await page.evaluateOnNewDocument(() => { (window as any).__CAPTURE__ = true })
-  await page.goto('file://' + htmlPath, { waitUntil: 'networkidle0' })
-  totalMs = await page.evaluate(() => (window as any).__DURATION)
-  const frames = Math.round((totalMs / 1000) * FPS)
-  console.log(`Durée ${totalMs} ms → ${frames} frames @ ${FPS} fps`)
-  for (let k = 0; k <= frames; k++) {
-    const t = Math.min(totalMs, (k / FPS) * 1000)
-    await page.evaluate((ms: number) => (window as any).__renderAt(ms), t)
-    await page.screenshot({ path: resolve(framesDir, `f_${String(k).padStart(4, '0')}.jpg`), type: 'jpeg', quality: 82 })
-  }
-  console.log('Frames capturées :', readdirSync(framesDir).length)
-} finally {
-  await browser.close()
-}
-
-const silent = resolve(out, 'pronoclip_france-vs-espagne_silent.mp4')
-const encRes = spawnSync(ffmpegPath as unknown as string, [
-  '-y', '-framerate', String(FPS), '-i', resolve(framesDir, 'f_%04d.jpg'),
-  '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', silent,
-], { encoding: 'utf8' })
-if (encRes.status !== 0) { console.error(encRes.stderr?.slice(-1500)); throw new Error('ffmpeg (vidéo muette) a échoué') }
-rmSync(framesDir, { recursive: true, force: true })
+const { path: silent, durationMs: totalMs } = await renderHtmlToSilentMp4({
+  htmlPath,
+  outPath: resolve(out, 'pronoclip_france-vs-espagne_silent.mp4'),
+  log: m => console.log(m),
+})
 console.log('Vidéo muette :', silent)
 
 // 6) AUDIO — narration → voix (cascade) + lit musical + whoosh aux coupes.
