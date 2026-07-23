@@ -39,6 +39,22 @@ RapidoCMS, **aucun stockage public** à lui. C'est le chemin le plus revendeur-f
   `post 427`, société 321). Léger décalage côté serveur, non documenté. → **Ask :**
   confirmer si c'est un lead-time minimal imposé, un arrondi, ou un bug de parsing.
 
+## 4. RapidoRH — journalisation des runs bloquée aujourd'hui
+
+Constaté en réel (2026-07-22, société 321, compte **owner**) :
+- **`create-daily-tool` est réservé aux comptes MEMBRE** — « les owners ne créent pas de
+  dailies ». Sur le compte propriétaire, la création **échoue** ; `get-dailies-tool` ne fait
+  que *lister* tous les dailies de la company.
+- Le **Kanban « PronoClip — Production vidéo »** (projet + colonnes Todo/Doing/Done/Échecs
+  attendu par le skill `suivi-rh-daily` Partie A) **n'existe pas** (seul un projet marketing
+  « pré-lancement » est présent).
+
+**Conséquence :** l'agent **ne peut pas journaliser ses runs** (dailies) depuis le compte
+owner aujourd'hui. **Ask / options :** soit exécuter la routine depuis un **compte membre**
+dédié, soit exposer une création de daily côté owner (ou un compte de service), soit créer
+le Kanban de production une fois (onboarding Partie A). D'ici là, le plugin **produit et
+publie** normalement ; seule la remontée RH (dailies) est en attente.
+
 ---
 
 ## Notes de contexte (garanties côté plugin)
