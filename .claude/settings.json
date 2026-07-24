@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "pronoclip-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "jasseurchibani/pronoclip-plugin"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "pronoclip-video@pronoclip-plugin": true
+  }
+}
