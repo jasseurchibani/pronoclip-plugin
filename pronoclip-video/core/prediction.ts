@@ -18,6 +18,7 @@ import type {
   Score,
   TeamSide,
 } from './types'
+import { GOAL_TYPES } from './types'
 import { makeRng, randomSeed, weightedPick } from './rng'
 
 // ---------------------------------------------------------------------------
@@ -150,8 +151,40 @@ const POS_BICYCLE: Record<Position, number> = { GK: 0, DF: 0.05, MF: 0.15, WG: 0
  * - coup franc : proportionnel à `setPieces` (0 pour un non-tireur) ;
  * - frappe lointaine / volée / retourné : modulés par le poste.
  */
-function goalTypeWeightsFor(player?: Player): ReadonlyArray<readonly [GoalType, number]> {
+/**
+ * Répartition PLATE par défaut, en pourcentage (somme = 100). Sert de secours quand le
+ * buteur n'a AUCUN profil football — cas d'un effectif semé depuis un simple dossier de
+ * portraits, où l'on ne connaît que les noms. Sans elle, `goal_normal` sort ~72 % du temps
+ * et coup franc / penalty sont IMPOSSIBLES (leurs facteurs valent 0). Surchargeable par
+ * `PredictionInput.goalTypeWeights` (lui-même alimenté par pronoclip.config.json).
+ */
+export const DEFAULT_FLAT_GOAL_TYPE_WEIGHTS: Readonly<Record<GoalType, number>> = {
+  goal_normal: 55,
+  goal_header: 16,
+  goal_longrange: 11,
+  goal_volley: 9,
+  goal_freekick: 3,
+  goal_penalty: 3,
+  goal_bicycle: 3,
+}
+
+/** Table plate (défaut + surcharge appelant), filtrée des poids nuls ou invalides. */
+function flatWeights(override?: Partial<Record<GoalType, number>>): ReadonlyArray<readonly [GoalType, number]> {
+  const merged = { ...DEFAULT_FLAT_GOAL_TYPE_WEIGHTS, ...override }
+  const entries = GOAL_TYPES
+    .map(t => [t, merged[t]] as const)
+    .filter((e): e is readonly [GoalType, number] => Number.isFinite(e[1]) && (e[1] as number) > 0)
+  // Table entièrement vidée par une surcharge aberrante → on ne bloque pas le rendu.
+  return entries.length > 0 ? entries : [['goal_normal', 1]]
+}
+
+function goalTypeWeightsFor(
+  player?: Player,
+  flatOverride?: Partial<Record<GoalType, number>>,
+): ReadonlyArray<readonly [GoalType, number]> {
   const prof = player?.profile
+  // Aucun profil → pondération par aptitude sans prise. On bascule sur la table plate.
+  if (!prof) return flatWeights(flatOverride)
   const pos = prof?.position
   const aerial = prof?.heading ?? (pos ? POS_AERIAL[pos] : 0.4)
   const longR = prof?.longRange ?? (pos ? POS_LONGRANGE[pos] : 0.35)
@@ -170,8 +203,12 @@ function goalTypeWeightsFor(player?: Player): ReadonlyArray<readonly [GoalType, 
   ]
 }
 
-function goalTypeFor(rng: () => number, player?: Player): GoalType {
-  return weightedPick(rng, goalTypeWeightsFor(player))
+function goalTypeFor(
+  rng: () => number,
+  player?: Player,
+  flatOverride?: Partial<Record<GoalType, number>>,
+): GoalType {
+  return weightedPick(rng, goalTypeWeightsFor(player, flatOverride))
 }
 
 /** Séquence chronologique des buts, en commençant par le domicile (2-1 → H, A, H). */
@@ -314,7 +351,7 @@ export function predictMatch(input: PredictionInput): Prediction {
       scorer = scorerFor(slot.teamSide === 'home' ? homePlayers : awayPlayers, goalOrder)
     }
     // Type fourni conservé ; sinon pondéré par le profil du buteur.
-    const goalType = slot.goalType ?? goalTypeFor(rng, scorer)
+    const goalType = slot.goalType ?? goalTypeFor(rng, scorer, input.goalTypeWeights)
     return {
       matchOrder: slot.matchOrder,
       teamSide: slot.teamSide,

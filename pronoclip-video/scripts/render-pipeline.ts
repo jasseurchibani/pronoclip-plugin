@@ -93,6 +93,8 @@ export async function renderMatchVideo(req: RenderMatchRequest): Promise<RenderM
     away: { ...req.away, players: orderRosterForMatch(req.away.players, seed ^ 0x9e3779b9) },
     competition: req.competition,
     seed, score: req.score, knockout: req.knockout,
+    // Table plate réglable sans toucher au code (buteurs sans profil uniquement).
+    goalTypeWeights: config.prediction?.goal_type_weights,
   })
   log(`Match : ${script.match.home} ${script.prediction.score.home}-${script.prediction.score.away} ${script.match.away}`)
   for (const g of script.prediction.goals) log(`  but : ${g.playerName} (${g.goalType})`)
