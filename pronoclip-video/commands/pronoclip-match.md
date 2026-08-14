@@ -19,8 +19,28 @@ C'est le chemin de test rapide. Il ne dépend ni de n8n ni d'Internet.
 3. Rendu **local et gratuit** par défaut (tier `motion`, Chrome + ffmpeg). Le tier
    `animated` (Kling, payant) et la voix `elevenlabs` sont **opt-in explicites**.
 
+Équivalent direct en ligne de commande, une commande → une vidéo :
+
+```
+npm run match -- Spain Portugal
+npm run match -- Mexico Brazil --score 2-1 --competition "Coupe du Monde 2026"
+```
+
 Démo immédiate sans argument ni config : `npm run render` produit le MP4 France vs
 Espagne.
+
+### Semer en masse depuis un dossier de portraits
+
+Un dossier `<Équipe>/<Nom du joueur>.png` suffit à semer toute la bibliothèque :
+
+```
+npm run seed-squads -- "<dossier>" --exclude="New folder"
+```
+
+Idempotent : une équipe déjà semée n'est jamais réécrite sans `--force`, donc les
+effectifs curés à la main (postes réels, joueurs clés, entraîneur) sont préservés.
+Les PNG ne sont pas copiés — `portrait` pointe en chemin absolu vers la source, et
+sera remplacé par l'URL publique RapidoCMS après téléversement.
 
 ## Mode optionnel `--today` — matchs réels du jour via n8n
 

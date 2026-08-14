@@ -9,6 +9,7 @@ import { readFileSync, mkdirSync, copyFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import type { MatchScript, Score, Team } from '../core/types'
+import { makeRng, randomSeed } from '../core/rng'
 import { buildMatchScript } from '../core/match-script'
 import { buildComposition } from '../core/composition'
 import { buildNarration } from '../core/narration'
@@ -54,6 +55,24 @@ export function slugify(value: string): string {
 }
 
 /**
+ * Effectif NON CURÉ (aucun `isKeyPlayer`) → ordre mélangé de façon déterministe par la
+ * graine du match. Sans ça, `scorerFor` prend toujours les premiers de la liste, c'est-à-dire
+ * l'ordre alphabétique des fichiers : le même buteur dans toutes les vidéos d'une équipe.
+ * Un effectif CURÉ (joueurs clés marqués à la main, comme France) est laissé INTACT —
+ * la curation prime. On ne fabrique aucun joueur : on ne fait que réordonner l'entrée.
+ */
+export function orderRosterForMatch(players: Team['players'], seed: number): Team['players'] {
+  if (players.some(p => p.isKeyPlayer)) return players
+  const rng = makeRng(seed)
+  const shuffled = [...players]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+/**
  * Produit le MP4 de bout en bout. La prédiction est LOCALE (core/prediction.ts via
  * buildMatchScript) : aucune source externe n'impose jamais le score ni les buteurs.
  */
@@ -68,9 +87,12 @@ export async function renderMatchVideo(req: RenderMatchRequest): Promise<RenderM
   log(`Mention IA OK. Métadonnées : ${JSON.stringify(metadata)}`)
 
   // 2) Prédiction locale + script.
+  const seed = req.seed ?? randomSeed()
   const script = buildMatchScript({
-    home: req.home, away: req.away, competition: req.competition,
-    seed: req.seed, score: req.score, knockout: req.knockout,
+    home: { ...req.home, players: orderRosterForMatch(req.home.players, seed) },
+    away: { ...req.away, players: orderRosterForMatch(req.away.players, seed ^ 0x9e3779b9) },
+    competition: req.competition,
+    seed, score: req.score, knockout: req.knockout,
   })
   log(`Match : ${script.match.home} ${script.prediction.score.home}-${script.prediction.score.away} ${script.match.away}`)
   for (const g of script.prediction.goals) log(`  but : ${g.playerName} (${g.goalType})`)

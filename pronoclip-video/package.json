@@ -11,6 +11,8 @@
     "prompts": "tsx scripts/generate-prompts.ts",
     "render": "tsx scripts/render-video.ts",
     "today": "tsx scripts/today.ts",
+    "match": "tsx scripts/match.ts",
+    "seed-squads": "tsx scripts/seed-squads-from-folder.ts",
     "demo": "tsx scripts/demo.ts",
     "animate": "tsx scripts/animate-shot.ts",
     "test-clip": "tsx scripts/test-clip-mbappe.ts",
