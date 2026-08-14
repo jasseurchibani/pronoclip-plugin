@@ -52,6 +52,54 @@ export function buildCaption(base: string, aiDisclosure: string): string {
   return `${clean}\n\n${disclosure}`
 }
 
+/** Entrées nécessaires pour composer un plan de publication depuis un match rendu. */
+export interface PublishPlanInput {
+  home: string
+  away: string
+  score: { home: number; away: number }
+  competition?: string
+  /** Buteurs, dans l'ordre du match. Cités dans la légende. */
+  scorers?: string[]
+  /** Mention IA obligatoire (§7) — refus de composer sans elle. */
+  aiDisclosure: string
+  /** Compte connecté cible. Vient de l'environnement, JAMAIS codé en dur. */
+  accountId: string
+  socialType?: SocialType
+  /** `null`/absent = brouillon non planifié. */
+  schedule?: { date: string; heure: string } | null
+  /** Suffixe libre pour distinguer un test d'une vraie publication. */
+  postNameSuffix?: string
+}
+
+/**
+ * Compose le plan de publication d'un match QUELCONQUE. Pur : aucune I/O, aucun MCP.
+ * C'est la fonction que la routine planifiée alimente ; l'agent exécute ensuite les
+ * trois appels MCP avec ces valeurs via `makePublisher`.
+ */
+export function buildPublishPlan(input: PublishPlanInput): PublishPlan {
+  if (!input.accountId?.trim()) {
+    throw new Error(
+      'Compte de publication absent : renseigne RAPIDOCMS_ACCOUNT_ID dans .env ' +
+      '(aucun identifiant client n\'est codé en dur — cf. garde-fous).',
+    )
+  }
+  const title = `${input.home} ${input.score.home}-${input.score.away} ${input.away}`
+  const base =
+    `🔮 Pronostic PronoClip — ${title}` +
+    (input.competition ? ` (${input.competition}).` : '.') +
+    (input.scorers?.length ? ` Buts : ${input.scorers.join(', ')}.` : '')
+
+  return {
+    postName: `PronoClip — ${input.home} vs ${input.away}${input.postNameSuffix ? ` (${input.postNameSuffix})` : ''}`,
+    socialType: input.socialType ?? 'instagram',
+    accountId: input.accountId,
+    postType: 'media',
+    mediaType: 'video',
+    caption: buildCaption(base, input.aiDisclosure),
+    schedule: input.schedule ?? null,
+  }
+}
+
 export interface PublishResult {
   upload: { mediaUrl: string; assetId?: string }
   draft: { draftId: string }
