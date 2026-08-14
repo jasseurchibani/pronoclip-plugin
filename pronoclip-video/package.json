@@ -18,7 +18,8 @@
     "test-clip": "tsx scripts/test-clip-mbappe.ts",
     "publish-video": "tsx scripts/publish-video.ts",
     "portrait": "tsx scripts/generate-portrait.ts",
-    "seed-missing": "tsx scripts/seed-missing-portraits.ts"
+    "seed-missing": "tsx scripts/seed-missing-portraits.ts",
+    "animate-video": "tsx scripts/animate-video.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

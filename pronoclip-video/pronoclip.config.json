@@ -64,6 +64,47 @@
         "fal-ai/veo3.1/fast/image-to-video": "$0.50 (audio off)",
         "fal-ai/sora-2/image-to-video": "$0.50 ($0.10/s)",
         "bytedance/seedance-2.0/image-to-video": "$1.51 ($0.3024/s)"
+      },
+      "default_provider": "fal",
+      "_providers_comment": "Fournisseurs image->video. N'IMPORTE QUELLE API convient : provider='http' decrit l'appel (url, en-tetes, corps, chemin de la video, sondage). La cle est lue dans l'environnement sous le nom declare par api_key_env - jamais ecrite ici. Jetons substituables dans headers/body : ${API_KEY} ${PROMPT} ${NEGATIVE_PROMPT} ${DURATION} ${IMAGE_DATA_URI} ${IMAGE_B64} ${IMAGE_URL} ${MODEL}. Choix a l'execution : npm run animate-video -- <A> <B> --provider=<nom>.",
+      "providers": {
+        "fal": {
+          "provider": "fal",
+          "api_key_env": "FAL_KEY",
+          "model": "fal-ai/kling-video/v3/pro/image-to-video"
+        },
+        "replicate": {
+          "provider": "http",
+          "api_key_env": "REPLICATE_API_TOKEN",
+          "submit_url": "https://api.replicate.com/v1/predictions",
+          "headers": {
+            "Authorization": "Bearer ${API_KEY}"
+          },
+          "model": "<version-id-du-modele>",
+          "body": {
+            "version": "${MODEL}",
+            "input": {
+              "prompt": "${PROMPT}",
+              "image": "${IMAGE_DATA_URI}",
+              "duration": "${DURATION}"
+            }
+          },
+          "video_path": "output",
+          "poll": {
+            "status_url": "https://api.replicate.com/v1/predictions/${ID}",
+            "id_path": "id",
+            "status_path": "status",
+            "done_values": [
+              "succeeded"
+            ],
+            "failed_values": [
+              "failed",
+              "canceled"
+            ],
+            "interval_ms": 5000,
+            "timeout_ms": 600000
+          }
+        }
       }
     }
   },
