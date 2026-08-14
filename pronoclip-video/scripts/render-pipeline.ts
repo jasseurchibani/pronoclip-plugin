@@ -17,6 +17,8 @@ import { assertDisclosure, buildVideoMetadata } from '../core/render-guard'
 import { synthesizeVoice, type TtsProvider } from '../adapters/tts'
 import { synthMusicBed, synthWhoosh, buildSfxTrack, muxAudio } from '../adapters/audio-mux'
 import { renderHtmlToSilentMp4, writeCompositionHtml } from '../adapters/local-render'
+import { resolvePortrait, slugifyTeam, DEFAULT_DATA_ROOT } from '../adapters/squad-library'
+import { cutoutCached } from '../adapters/portrait-cutout'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
@@ -73,6 +75,45 @@ export function orderRosterForMatch(players: Team['players'], seed: number): Tea
 }
 
 /**
+ * Portrait DÉTOURÉ d'un joueur, prêt à être incrusté, ou `null` si indisponible.
+ *
+ * Une URL `https://` (portrait canonique servi par RapidoCMS) est renvoyée telle quelle :
+ * rien à détourer localement. Un fichier local est détouré une fois puis mis en cache,
+ * et copié dans le dossier de sortie pour être référencé en chemin RELATIF — la page est
+ * chargée depuis ce dossier, c'est ce que Chrome sait résoudre.
+ *
+ * Ne lève jamais : un joueur non semé ou un détourage raté rend `null`, et le plan
+ * retombe sur le panneau généré.
+ */
+function portraitSrcFor(
+  playerName: string,
+  side: 'home' | 'away',
+  req: RenderMatchRequest,
+  config: { brand?: { namespace?: string } },
+  log: (m: string) => void,
+): string | null {
+  const team = side === 'home' ? req.home.name : req.away.name
+  try {
+    const source = resolvePortrait(playerName, team, config.brand?.namespace ?? 'pronoclip')
+    if (/^https?:\/\//i.test(source)) return source
+
+    const teamCode = slugifyTeam(team)
+    const key = `${teamCode}_${slugify(playerName)}.png`
+    const cachePath = resolve(DEFAULT_DATA_ROOT, '.portraits-cutout', teamCode, key)
+    const cut = cutoutCached(source, cachePath)
+    if (!cut) return null
+
+    // Référence relative au dossier de sortie, où la page HTML est écrite.
+    const localName = `cutout_${key}`
+    copyFileSync(cut, resolve(OUTPUT_DIR, localName))
+    return localName
+  } catch (err) {
+    log(`  portrait indisponible pour ${playerName} (${team}) — panneau généré à la place`)
+    return null
+  }
+}
+
+/**
  * Produit le MP4 de bout en bout. La prédiction est LOCALE (core/prediction.ts via
  * buildMatchScript) : aucune source externe n'impose jamais le score ni les buteurs.
  */
@@ -99,8 +140,17 @@ export async function renderMatchVideo(req: RenderMatchRequest): Promise<RenderM
   log(`Match : ${script.match.home} ${script.prediction.score.home}-${script.prediction.score.away} ${script.match.away}`)
   for (const g of script.prediction.goals) log(`  but : ${g.playerName} (${g.goalType})`)
 
-  // 3) Composition HTML → MP4 muet (Chrome + ffmpeg).
-  const images = req.images ?? script.shots.map(() => '')
+  // 3) Images des plans. Par défaut : le PORTRAIT DÉTOURÉ du joueur du plan — les
+  // portraits existent déjà, donc c'est gratuit. Un plan sans joueur (face-à-face,
+  // score final) garde le panneau généré. Un portrait absent dégrade en panneau, jamais
+  // en échec.
+  const images = req.images ?? script.shots.map(s =>
+    s.playerName && s.teamSide !== 'both' && s.teamSide !== null
+      ? portraitSrcFor(s.playerName, s.teamSide, req, config, log) ?? ''
+      : '',
+  )
+  const withPortrait = images.filter(Boolean).length
+  log(`Images : ${withPortrait}/${images.length} plan(s) avec portrait détouré, le reste en panneau généré.`)
   const body = buildComposition({ script, images, config })
   const htmlPath = writeCompositionHtml(resolve(OUTPUT_DIR, `${req.outBase}.html`), body, config.brand.colors.background)
   const { path: silent, durationMs } = await renderHtmlToSilentMp4({
