@@ -10,10 +10,15 @@
     "example": "tsx scripts/generate-example.ts",
     "prompts": "tsx scripts/generate-prompts.ts",
     "render": "tsx scripts/render-video.ts",
+    "today": "tsx scripts/today.ts",
+    "match": "tsx scripts/match.ts",
+    "seed-squads": "tsx scripts/seed-squads-from-folder.ts",
     "demo": "tsx scripts/demo.ts",
     "animate": "tsx scripts/animate-shot.ts",
     "test-clip": "tsx scripts/test-clip-mbappe.ts",
-    "publish-video": "tsx scripts/publish-video.ts"
+    "publish-video": "tsx scripts/publish-video.ts",
+    "portrait": "tsx scripts/generate-portrait.ts",
+    "seed-missing": "tsx scripts/seed-missing-portraits.ts"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",

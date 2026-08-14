@@ -161,6 +161,14 @@ export interface PredictionInput {
   market?: MarketConstraints
   /** Graine de reproductibilité. Absente → dérivée du nom des équipes. */
   seed?: number
+  /**
+   * Répartition PLATE des types de but, en pourcentage, appliquée aux buteurs SANS
+   * profil football. Sans profil, la pondération par poste n'a rien à mordre : tout le
+   * monde est identique, `goal_normal` écrase le tirage et coup franc / penalty sont
+   * mathématiquement impossibles (multipliés par 0). Cette table les rallume.
+   * Un buteur AVEC profil garde la pondération par aptitude — la curation prime.
+   */
+  goalTypeWeights?: Partial<Record<GoalType, number>>
 }
 
 /** Un plan du montage (8 au total). */
