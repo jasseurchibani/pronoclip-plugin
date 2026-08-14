@@ -16,8 +16,12 @@ C'est le chemin de test rapide. Il ne dépend ni de n8n ni d'Internet.
 2. Invoquer le skill **`video-pronostic`** et suivre son pipeline (predict →
    match-script → composition → rendu local → voix off + audio). Il demande les
    entrées obligatoires manquantes (compétition, date/heure) — ne rien inventer.
-3. Rendu **local et gratuit** par défaut (tier `motion`, Chrome + ffmpeg). Le tier
-   `animated` (Kling, payant) et la voix `elevenlabs` sont **opt-in explicites**.
+3. Rendu **local et gratuit** par défaut (tier `motion`, Chrome + ffmpeg). La voix
+   `elevenlabs` est un **opt-in explicite** (`--voice=elevenlabs`).
+
+Pour le tier **`animated`** (vrais clips image→vidéo, ~4,50 $ la vidéo), utiliser la
+commande dédiée **`/pronoclip-animated`** — elle impose le devis puis l'accord explicite
+avant toute dépense.
 
 Équivalent direct en ligne de commande, une commande → une vidéo :
 
